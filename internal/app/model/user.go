@@ -7,15 +7,15 @@ import (
 )
 
 type User struct {
-	Id                int
-	First_name        string
-	Second_name       string
-	Email             string
-	Password          string
-	EncryptedPassword string
-	Card_number       int
-	Card_cvv          int
-	Image             byte
+	Id                int    `json:"id"`
+	First_name        string `json:"first_name"`
+	Second_name       string `json:"second_name"`
+	Email             string `json:"email"`
+	Password          string `json:"password,omitempty"`
+	EncryptedPassword string `json:"encryptedpassword"`
+	Card_number       int    `json:"card_number"`
+	Card_cvv          int    `json:"card_cvv"`
+	Image             byte   `json:"image"`
 }
 
 // Валидация
@@ -37,6 +37,14 @@ func (u *User) BeforeCreate() error {
 	}
 
 	return nil
+}
+
+func (u *User) Sanitize() {
+	u.Password = ""
+}
+
+func (u *User) ComparePassword(password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(u.EncryptedPassword), []byte(password)) == nil
 }
 
 func encryptString(s string) (string, error) {
