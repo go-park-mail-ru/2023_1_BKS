@@ -28,6 +28,27 @@ func (r *UserRepository) Create(u *model.User) error {
 }
 
 // Ищем пользователя
+func (r *UserRepository) Find(id int) (*model.User, error) {
+	u := &model.User{}
+	if err := r.store.db.QueryRow("SELECT id, first_name, second_name, email, password FROM users WHERE id = $1",
+		id,
+	).Scan(
+		&u.Id,
+		&u.First_name,
+		&u.Second_name,
+		&u.Email,
+		&u.EncryptedPassword,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+		return nil, err
+	}
+
+	return u, nil
+}
+
+// Ищем пользователя по почте
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow("SELECT id, first_name, second_name, email, password FROM users WHERE email = $1",
