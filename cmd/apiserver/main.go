@@ -20,8 +20,7 @@ func main() {
 	flag.Parse()
 
 	config := apiserver.NewConfig()
-	_, err := toml.DecodeFile(configPath, config)
-	if err != nil {
+	if _, err := toml.DecodeFile(configPath, config); err != nil {
 		log.Fatal("Error to decode file: ", err)
 	}
 	
