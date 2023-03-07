@@ -24,9 +24,8 @@ func main() {
 	if err != nil {
 		log.Fatal("Error to decode file: ", err)
 	}
-	// Запускаем сервер
+	
 	if err := apiserver.Start(config); err != nil {
 		log.Fatal(err)
 	}
-
 }
