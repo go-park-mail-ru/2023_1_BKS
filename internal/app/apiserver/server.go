@@ -192,7 +192,7 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 	s.respond(w, r, code, map[string]string{"error": err.Error()})
 }
 
-func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
+func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data any) {
 	w.WriteHeader(code)
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
