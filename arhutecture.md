@@ -103,7 +103,7 @@ type MyConstraint interface {
  int | int8 | int16 | int32 | int64
 }
 ```
-Чисто теоритически для большей безопасности можно использовать вместо any, что то на подобии.
+Чисто теоритически для большей безопасности можно использовать вместо any, что то на подобии того, что выше.
 
 
 ### Основной принцип работы
@@ -115,3 +115,22 @@ type MyConstraint interface {
 Пример работы: При set в БД в первую очередь ищется таблица с названием структуры.
 Далее идёт валидация на не заполненность данных в строке с данным id. Далее идёт итерирование по structure и запись в БД.
 Get подобным образом.
+
+
+package main
+
+import "fmt"
+
+type Str struct {
+	str map[string]any
+}
+
+func main() {
+
+	str1 := make(map[string]any)
+	str1["dws"] = "dw"
+	str1["dws1"] = 1
+	var str Str
+	str.str = str1
+	fmt.Println(str)
+}
