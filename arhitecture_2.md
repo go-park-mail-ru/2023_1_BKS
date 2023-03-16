@@ -100,7 +100,7 @@ func (en *DataBaseSQL) Create(Entity) error
 
 func (en *DataBaseSQL) Edit(Entity) error
 
-func (en *DataBaseSQL) Delite(Entity) error
+func (en *DataBaseSQL) Delete(Entity) error
 ```
 
 
