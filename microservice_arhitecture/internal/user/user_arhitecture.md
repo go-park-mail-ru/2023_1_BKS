@@ -46,7 +46,7 @@ func ValidatePassword(l_pass, r_pass string) []error
 
 
 ```
-func HashedPassword(password string, hasher Hash) []byte
+func HashedPassword(password []byte, hasher Hash) []byte
 
 ```
 
@@ -56,4 +56,7 @@ func HashedPassword(password string, hasher Hash) []byte
 
 Обозначения: password - пароль.
 
+Требования: Прогнать два раза, например один раз это md5, другой sha256.
+
 # Delivery
+
