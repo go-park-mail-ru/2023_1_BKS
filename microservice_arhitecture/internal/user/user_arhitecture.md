@@ -46,7 +46,7 @@ func ValidatePassword(l_pass, r_pass string) []error
 
 
 ```
-func HashedPassword(password []byte, hasher Hash) []byte
+func HashedPassword(password []byte, hasher Hash) ([]byte, error)
 
 ```
 
