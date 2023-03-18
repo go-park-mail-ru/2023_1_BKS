@@ -45,18 +45,9 @@ func ValidatePassword(l_pass, r_pass string) []error
 Требования: Проверка осуществляется перед шифрованием пароля.
 
 
-```
-func HashedPassword(password []byte, hasher Hash) ([]byte, error)
+https://rietta.com/blog/bcrypt-not-sha-for-passwords/
 
-```
-
-Где доступен: Данный класс доступен на всех слоях ниже usecase.
-
-Описание: Данная функция хеширует пароль.
-
-Обозначения: password - пароль.
-
-Требования: Прогнать два раза, например один раз это md5, другой sha256.
+Шифрование пароля будет осуществляться модулем bcrypt.
 
 # Delivery
 
