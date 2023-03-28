@@ -6,6 +6,8 @@ https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/
 
 https://github.com/MaksimDzhangirov/practicalDDD?ysclid=lfjh3z6dyf136588793
 
+https://github.com/evrone/go-clean-template?ysclid=lfr9apuyk2203826168
+
 Тесты:
 
 БД:
