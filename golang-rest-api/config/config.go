@@ -1,10 +1,10 @@
 package config
 
 type Config struct {
-	BindAddr    string `yaml:"bind_addr"`
-	LogLevel    string `yaml:"log_level"`
-	DatabaseURL string `yaml:"database_url"`
-	SessionKey  string `yaml:"session_key"`
+	BindAddr    string `toml:"bind_addr"`
+	LogLevel    string `toml:"log_level"`
+	DatabaseURL string `toml:"database_url"`
+	SessionKey  string `toml:"session_key"`
 }
 
 func NewConfig() *Config {
