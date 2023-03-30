@@ -1,4 +1,4 @@
-package authapp
+package app
 
 //Корневой агрегат для доступа к бизнес-логике сервиса авторизации
 type Application struct {

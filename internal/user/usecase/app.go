@@ -1,4 +1,4 @@
-package userapp
+package app
 
 //Корневой агрегат для доступа к бизнес-логике сервиса пользователя
 type Application struct {
