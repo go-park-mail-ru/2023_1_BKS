@@ -3,20 +3,20 @@ package controller
 import (
 	"net/http"
 
-	"github.com/2023_1_BKS/internal/app/service"
+	"github.com/2023_1_BKS/internal/app/user"
 )
 
 type Handler struct {
-	userUseCase service.IUserUseCase
+	userUseCase user.IUserUsecase
 }
 
-func NewHandler(useCase service.IUserUseCase) *Handler {
+func NewHandler(useCase user.IUserUsecase) *Handler {
 	return &Handler{
 		userUseCase: useCase,
 	}
 }
 
-func HTTPEndPoints(router *http.ServeMux, uuc service.IUserUseCase) {
+func HTTPEndPoints(router *http.ServeMux, uuc user.IUserUsecase) {
 	h := NewHandler(uuc)
 
 	router.HandleFunc("/appuniq/register", h.Register)
