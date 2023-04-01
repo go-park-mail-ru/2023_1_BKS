@@ -59,7 +59,7 @@ func (e *LoginAcceptableValuesErr) Error() string {
 
 type FirstNameLengthErr struct{}
 
-func (e *FirstNameErr) Error() string {
+func (e *FirstNameLengthErr) Error() string {
 	return "Имя не было введено"
 }
 
