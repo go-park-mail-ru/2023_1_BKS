@@ -1,11 +1,14 @@
 package entity
 
-import "image"
+import (
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/domain/object"
+	"github.com/google/uuid"
+)
 
 type Post struct {
-	ID     int
-	UserID int
-	Title  string
-	Body   string
-	Image  []image.RGBA
+	ID       uuid.UUID
+	UserUUID object.UserID
+	Title    object.Title
+	Body     object.Body
+	Image    object.Image
 }
