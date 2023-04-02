@@ -1,22 +1,51 @@
 package error
 
-// Ошибка, которая возникает при пустом заголовке
+import "fmt"
+
+// TitleEmptyErr возвращается при пустом заголовке
 type TitleEmptyErr struct{}
 
-func (p *TitleEmptyErr) Error() string {
+func (e *TitleEmptyErr) Error() string {
 	return "Заголовок не должен быть пустым"
 }
 
-// Ошибка, которая возникает при пустом описании
+// BodyEmptyErr возвращается при пустом описании
 type BodyEmptyErr struct{}
 
-func (p *BodyEmptyErr) Error() string {
+func (e *BodyEmptyErr) Error() string {
 	return "Описание не должно быть пустым"
 }
 
-// Ошибка, которая возникает при отсутствии изображений товара
+// ImageEmptyErr возвращается при отсутствии изображений товара
 type ImageEmptyErr struct{}
 
-func (p *ImageEmptyErr) Error() string {
+func (e *ImageEmptyErr) Error() string {
 	return "Вставьте хотя бы 1 изображение товара"
+}
+
+// LongBodyErr возвращается при превышении максимальной длины описания
+type LongBodyErr struct {
+	MaxLength int
+}
+
+func (e *LongBodyErr) Error() string {
+	return fmt.Sprintf("Описание должно содержать не более %d символов\n", e.MaxLength)
+}
+
+// LongTitleErr возвращается при превышении максимальной длины заголовка
+type LongTitleErr struct {
+	MaxLength int
+}
+
+func (e *LongTitleErr) Error() string {
+	return fmt.Sprintf("Заголовок должен содержать не более %d символов\n", e.MaxLength)
+}
+
+// ManyImagesErr возвращается при превышении максимального количества изображений
+type ManyImagesErr struct {
+	MaxCount int
+}
+
+func (e *ManyImagesErr) Error() string {
+	return fmt.Sprintf("Всего может быть не более %d картинок\n", e.MaxCount)
 }
