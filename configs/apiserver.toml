@@ -1,4 +1,0 @@
-bind_addr = ":8080"
-log_level = "debug"
-database_url = "postgres://root:root@localhost/2023_2_BKS?sslmode=disable"
-session_key = "xyslSeLQhulMbh2yC4OMVgRu7pSFwhQcSnBg9ZnxKuTQjlEARDQjdm8p0Rp2yLL3KmJEElKYIgTFMfDT1vygjDyZMwzRiW05NLplz5t7G2OzItzsnPbdX8U4URmlKQLA"
