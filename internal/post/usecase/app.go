@@ -1,4 +1,4 @@
-package postapp
+package app
 
 //Корневой агрегат для доступа к бизнес-логике сервиса постов
 type Application struct {
