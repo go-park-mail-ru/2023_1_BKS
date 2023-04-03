@@ -8,9 +8,12 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 )
 
+require golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
+
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/disintegration/imaging v1.6.2
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
