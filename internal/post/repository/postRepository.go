@@ -17,7 +17,7 @@ type IPostRepository interface {
 	FindPostByID(ctx context.Context, ID uuid.UUID) (*domain.Post, error)
 	FindPostsByTitle(ctx context.Context, title string) (*domain.Post, error)
 	SavePost(ctx context.Context, post domain.Post) (*domain.Post, error)
-	DeletePost(ctx context.Context, post domain.Post) (*domain.Post, error)
+	DeletePost(ctx context.Context, id uuid.UUID) error
 	UpdatePost(ctx context.Context, ID uuid.UUID) (*domain.Post, error)
 }
 
@@ -88,8 +88,8 @@ func (c *PostConnection) SavePost(ctx context.Context, post domain.Post) (*domai
 	return &post, nil
 }
 
-func (c *PostConnection) DeletePost(ctx context.Context, post domain.Post) error {
-	_, err := c.connection.ExecContext(ctx, "DELETE FROM posts WHERE id=$1", post.ID.String())
+func (c *PostConnection) DeletePost(ctx context.Context, id uuid.UUID) error {
+	_, err := c.connection.ExecContext(ctx, "DELETE FROM posts WHERE id=$1", id.String())
 	return err
 }
 
