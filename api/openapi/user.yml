@@ -1,0 +1,201 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: AppUniq <service User>
+  description: OpenApi 3.0 для сервиса user сайта AppUniq.
+servers:
+  - url: https://appuniq.ru/api
+paths:
+  /user:
+    get:
+      summary: Вернуть данные пользователя.
+      operationId: getUser
+      responses:
+        '200':
+          description: Ок.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUser'
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+              encoding:
+                Avatar:
+                  contentType: image/png, image/jpeg
+    post:
+      summary: Создать нового пользователя.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+            encoding:
+              Avatar:
+                contentType: image/png, image/jpeg
+      responses:
+        '201':
+          description: Пользователь успешно создан.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+    put:
+      summary: Обновить пользователя.
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+            encoding:
+              Avatar:
+                contentType: image/png, image/jpeg
+      responses:
+        '200':
+          description: Пользователь успешно обновлён.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUser'
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+    delete:
+      summary: Удалить пользователя.
+      operationId: deleteUser
+      responses:
+        '204':
+          description: Поьзователь удалён.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+  /user/{id}:
+    get:
+      summary: Вернуть пользователя по id.
+      operationId: findUserByID
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь получен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUser'
+              encoding:
+                Avatar:
+                  contentType: image/png, image/jpeg
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+components:
+  schemas:
+    CreateUser:
+      allOf:
+        - $ref: '#/components/schemas/CreateUser'
+        - required:
+            - Email
+            - Login
+            - PhoneNumber
+            - SecondName
+            - FirstName
+            - Password
+            - PasswordCheck
+          properties:
+            Email:
+              type: string
+              format: email
+              description: Email пользователя.
+            Login:
+              type: string
+              description: Логин пользователя.
+            PhoneNumber:
+              type: string
+              format: phone
+              description: Логин пользователя.
+            SecondName:
+              type: string
+              description: Фамилия пользователя.
+            FirstName:
+              type: string
+              description: Имя пользователя.
+            Patronimic:
+              type: string
+              description: Отчество пользователя.
+            Password:
+              type: string
+              description: Пароль пользователя.
+            PasswordCheck:
+              type: string
+              description: Проверка пароля пользователя.
+            Avatar:
+              type: string
+              format: binary
+              description: Аватар пользователя.
+    GetUser:
+      allOf:
+        - $ref: '#/components/schemas/GetUser'
+        - required:
+            - Id
+            - PhoneNumber
+            - SecondName
+            - FirstName
+          properties:
+            ID:
+              type: string
+              format: uuid
+              description: Логин пользователя.
+            PhoneNumber:
+              type: string
+              format: number
+              description: Логин пользователя.
+            SecondName:
+              type: string
+              description: Фамилия пользователя.
+            FirstName:
+              type: string
+              description: Имя пользователя.
+            Patronimic:
+              type: string
+              description: Отчество пользователя.
+            Avatar:
+              type: string
+              format: binary
+              description: Аватар пользователя.
+
+    ErrorHTTP:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code
+        message:
+          type: string
+          description: Error message
