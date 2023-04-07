@@ -1,5 +1,7 @@
 package domain
 
+import "image"
+
 type Email string
 
 type Login string
@@ -17,3 +19,6 @@ type CompanyName [2]string
 
 //Используется для хранения адрессов
 type Adress string
+
+//Используется для хранения изображений
+type Avatar image.RGBA

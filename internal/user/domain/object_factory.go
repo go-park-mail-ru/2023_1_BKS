@@ -1,5 +1,7 @@
 package domain
 
+import "image"
+
 func CreateEmail(email string) Email {
 	return Email(email)
 }
@@ -20,4 +22,8 @@ func CreateFullName(second_name, first_name, patronimic string) FullName {
 func CreateCompanyName(type_company, name string) CompanyName {
 	string_massive := [2]string{type_company, name}
 	return CompanyName(string_massive)
+}
+
+func CreateAvatar(avatar image.RGBA) Avatar {
+	return Avatar(avatar)
 }

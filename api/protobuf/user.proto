@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = "2023_1_BKS/internal/user/delivery/grpc";
+
+package delivery;
+
+message FullUser {
+    required UUID ID = 1;
+}
+
+message Session {
+  string login = 1;
+  string useragent = 2;
+}
+
+message Nothing {
+  bool dummy = 1;
+}
+
+// grpc-сервис проверки авторизации
+service User {
+    rpc Create (Session) returns (SessionID) {}
+    rpc Check (SessionID) returns (Session) {}
+    rpc Delete (SessionID) returns (Nothing) {}
+}
+

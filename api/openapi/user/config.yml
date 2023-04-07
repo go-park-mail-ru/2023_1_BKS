@@ -1,0 +1,6 @@
+package: delivery
+output: http.go
+generate:
+  echo-server: true
+  embedded-spec: true
+  models: false

@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: AppUniq <service User>
+  title: AppUniq <service User> API
   description: OpenApi 3.0 для сервиса user сайта AppUniq.
 servers:
   - url: https://appuniq.ru/api
