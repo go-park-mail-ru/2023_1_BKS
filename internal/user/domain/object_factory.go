@@ -24,6 +24,6 @@ func CreateCompanyName(type_company, name string) CompanyName {
 	return CompanyName(string_massive)
 }
 
-func CreateAvatar(avatar image.RGBA) Avatar {
+func CreateAvatar(avatar image.Image) Avatar {
 	return Avatar(avatar)
 }

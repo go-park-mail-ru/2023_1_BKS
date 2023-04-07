@@ -13,7 +13,7 @@ func CreateUser(
 	firstName,
 	secondName,
 	patronimic string,
-	avatar image.RGBA,
+	avatar image.Image,
 ) (User, []error) {
 	/*var allErr []error
 

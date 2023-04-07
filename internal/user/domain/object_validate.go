@@ -1,10 +1,7 @@
 package domain
 
 import (
-	"bytes"
 	"image"
-	"image/jpeg"
-	"image/png"
 	"regexp"
 	"unicode"
 )
@@ -293,36 +290,6 @@ type AvatarWightValidation struct {
 	maxImageSize uint
 }
 
-func (e AvatarWightValidation) IsValid(avatar image.RGBA) []error {
-	var format string
-	// Определяем расширение
-	if avatar.Opaque() {
-		format = "jpeg"
-	} else {
-		format = "png"
-	}
+func (e AvatarWightValidation) IsValid(avatar image.Image) []error {
 
-	// Проверяем размер изображения
-	buf := new(bytes.Buffer)
-
-	switch format {
-	case "png":
-		if err := png.Encode(buf, &avatar); err != nil {
-			return append([]error{}, err)
-		}
-	case "jpeg":
-		// Создаем промежуточный объект
-		bounds := avatar.Bounds()
-		jpegImage := image.NewRGBA(bounds)
-		jpegImage.Pix = avatar.Pix
-
-		if err := jpeg.Encode(buf, jpegImage, nil); err != nil {
-			return append([]error{}, err)
-		}
-	}
-
-	if uint(buf.Len()) > e.maxImageSize {
-		return append([]error{}, AvatarWeightErr{e.maxImageSize})
-	}
-	return nil
 }

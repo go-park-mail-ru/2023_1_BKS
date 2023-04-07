@@ -21,4 +21,4 @@ type CompanyName [2]string
 type Adress string
 
 //Используется для хранения изображений
-type Avatar image.RGBA
+type Avatar image.Image
