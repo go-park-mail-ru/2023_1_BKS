@@ -5,7 +5,7 @@ option go_package = "2023_1_BKS/internal/user/delivery/grpc";
 package delivery;
 
 message FullUser {
-    required UUID ID = 1;
+    required uuid ID = 1;
 }
 
 message Session {
