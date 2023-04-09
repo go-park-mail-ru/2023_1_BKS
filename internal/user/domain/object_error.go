@@ -68,6 +68,28 @@ func (e EmailMinLengthErr) Error() string {
 	return fmt.Sprintf("Минимальная длина email: %d\n", e.length)
 }
 
+type PhoneNumberRequiredValueErr struct{}
+
+func (e PhoneNumberRequiredValueErr) Error() string {
+	return "Введите валидный телефонный номер"
+}
+
+type PhoneNumberMaxLengthErr struct {
+	length uint
+}
+
+func (e PhoneNumberMaxLengthErr) Error() string {
+	return fmt.Sprintf("Максимальная длина телефонного номера: %d\n", e.length)
+}
+
+type PhoneNumberMinLengthErr struct {
+	length uint
+}
+
+func (e PhoneNumberMinLengthErr) Error() string {
+	return fmt.Sprintf("Минимальная длина телефонного номера: %d\n", e.length)
+}
+
 type LoginAcceptableValuesErr struct {
 	nonAcceptableValues map[rune]bool
 }

@@ -1,27 +1,43 @@
 package domain
 
 import (
-	"image"
 	"regexp"
 	"unicode"
 )
 
-type PassSpecification interface {
-	IsValid(password string) []error
+type typeSpecification interface {
+	string | rune
+}
+
+type Specification[T typeSpecification] interface {
+	IsValid(verifiable T) error
+}
+
+type PassSpecification struct {
+	specifications map[string]Specification[string]
+}
+
+func (e PassSpecification) IsValid(pass string) error {
+	if err := e.specifications["AND"].IsValid(pass); err != nil {
+		return err
+	}
+	if err := e.specifications["OR"].IsValid(pass); err != nil {
+		return err
+	}
+	return nil
 }
 
 type PassAndSpecification struct {
-	specifications []PassSpecification
+	specifications map[string]Specification[string]
 }
 
-func (e PassAndSpecification) IsValid(pass string) []error {
-	var errors []error
+func (e PassAndSpecification) IsValid(pass string) error {
 	for _, specification := range e.specifications {
 		if err := specification.IsValid(pass); err != nil {
-			errors = append(errors, err...)
+			return err
 		}
 	}
-	return errors
+	return nil
 }
 
 type PassLengthValidation struct {
@@ -29,65 +45,81 @@ type PassLengthValidation struct {
 	minLength uint
 }
 
-func (e PassLengthValidation) IsValid(pass string) []error {
+func (e PassLengthValidation) IsValid(pass string) error {
 	if e.minLength < uint(len(pass)) && e.maxLength < uint(len(pass)) {
-		return append([]error{}, PassMaxLengthErr{e.maxLength})
+		return PassMaxLengthErr{e.maxLength}
 	}
 	if e.minLength > uint(len(pass)) && e.maxLength > uint(len(pass)) {
-		return append([]error{}, PassMinLengthErr{e.minLength})
+		return PassMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type PassSpecialCharactersValidation struct {
+type PassForRuneValidation struct {
+	specifications map[string]Specification[rune]
+}
+
+func (e PassForRuneValidation) IsValid(pass string) error {
+	var errSC error
+	var errUC error
+	var errLC error
+	for _, char := range pass {
+		errSC = e.specifications["PassSpecialCharacters"].IsValid(char)
+		errUC = e.specifications["PassUpperCase"].IsValid(char)
+		errLC = e.specifications["PassLowerCase"].IsValid(char)
+	}
+	if errSC != nil {
+		return errSC
+	}
+	if errUC != nil {
+		return errUC
+	}
+	if errLC != nil {
+		return errLC
+	}
+	return nil
+
+}
+
+type passSpecialCharactersValidation struct {
 	specialChar map[rune]bool
 }
 
-func (e PassSpecialCharactersValidation) IsValid(pass string) []error {
-	for _, char := range pass {
-		if e.specialChar[char] {
-			return nil
-		}
+func (e passSpecialCharactersValidation) IsValid(char rune) error {
+	if e.specialChar[char] {
+		return nil
 	}
-	return append([]error{}, PassSpecialCharactersErr{e.specialChar})
+	return PassSpecialCharactersErr{e.specialChar}
 }
 
-type PassUpperCaseValidation struct{}
+type passUpperCaseValidation struct{}
 
-func (e PassUpperCaseValidation) IsValid(pass string) []error {
-	for _, char := range pass {
-		if !unicode.IsLower(char) {
-			return nil
-		}
+func (e passUpperCaseValidation) IsValid(char rune) error {
+	if unicode.IsUpper(char) {
+		return nil
 	}
-	return append([]error{}, PassUpperCaseErr{})
+	return PassUpperCaseErr{}
 }
 
-type PassLowerCaseValidation struct{}
+type passLowerCaseValidation struct{}
 
-func (e PassLowerCaseValidation) IsValid(pass string) []error {
-	for _, char := range pass {
-		if unicode.IsLower(char) {
-			return nil
-		}
+func (e passLowerCaseValidation) IsValid(char rune) error {
+	if unicode.IsLower(char) {
+		return nil
 	}
-	return append([]error{}, PassLowerCaseErr{})
-}
-
-type EmailSpecification interface {
-	IsValid(email string) []error
+	return PassLowerCaseErr{}
 }
 
 type EmailAndSpecification struct {
-	specifications []EmailSpecification
+	specifications map[string]Specification[string]
 }
 
 type EmailRequiredValueValidation struct{}
 
-func (e EmailRequiredValueValidation) IsValid(email string) []error {
+func (e EmailRequiredValueValidation) IsValid(email string) error {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	if !emailRegex.MatchString(email) {
-		return append([]error{}, EmailRequiredValueErr{})
+		return EmailRequiredValueErr{}
 	} else {
 		return nil
 	}
@@ -98,35 +130,69 @@ type EmailLengthValidation struct {
 	maxLength uint
 }
 
-func (e EmailLengthValidation) IsValid(email string) []error {
+func (e EmailLengthValidation) IsValid(email string) error {
 	if e.minLength < uint(len(email)) && e.maxLength < uint(len(email)) {
-		return append([]error{}, EmailMaxLengthErr{e.maxLength})
+		return EmailMaxLengthErr{e.maxLength}
 	}
 	if e.minLength > uint(len(email)) && e.maxLength > uint(len(email)) {
-		return append([]error{}, EmailMinLengthErr{e.minLength})
+		return EmailMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type LoginSpecification interface {
-	IsValid(login string) []error
+type PhoneNumberSpecification interface {
+	IsValid(phone string) error
+}
+
+type PhoneNumberOrSpecification struct {
+	specifications map[string]Specification[string]
+}
+
+type PhoneNumberAndSpecification struct {
+	specifications map[string]Specification[string]
+}
+
+type PhoneNumberRussianRequiredValueValidation struct{}
+
+func (e PhoneNumberRussianRequiredValueValidation) IsValid(phone string) error {
+	emailRegex := regexp.MustCompile(`^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$`)
+	if !emailRegex.MatchString(phone) {
+		return EmailRequiredValueErr{}
+	} else {
+		return nil
+	}
+}
+
+type PhoneNumberLengthValidation struct {
+	minLength uint
+	maxLength uint
+}
+
+func (e PhoneNumberLengthValidation) IsValid(phone string) error {
+	if e.minLength < uint(len(phone)) && e.maxLength < uint(len(phone)) {
+		return EmailMaxLengthErr{e.maxLength}
+	}
+	if e.minLength > uint(len(phone)) && e.maxLength > uint(len(phone)) {
+		return EmailMinLengthErr{e.minLength}
+	}
+	return nil
 }
 
 type LoginAndSpecification struct {
-	specifications []LoginSpecification
+	specifications map[string]Specification[string]
 }
 
 type LoginAcceptableValuesValidation struct {
 	NonAcceptableValues map[rune]bool
 }
 
-func (e LoginAcceptableValuesValidation) IsValid(email string) []error {
+func (e LoginAcceptableValuesValidation) IsValid(email string) error {
 	for char := range e.NonAcceptableValues {
 		if e.NonAcceptableValues[char] {
 			return nil
 		}
 	}
-	return append([]error{}, LoginAcceptableValuesErr{e.NonAcceptableValues})
+	return LoginAcceptableValuesErr{e.NonAcceptableValues}
 }
 
 type LoginLengthValidation struct {
@@ -134,22 +200,18 @@ type LoginLengthValidation struct {
 	maxLength uint
 }
 
-func (e LoginLengthValidation) IsValid(login string) []error {
+func (e LoginLengthValidation) IsValid(login string) error {
 	if e.minLength < uint(len(login)) && e.maxLength < uint(len(login)) {
-		return append([]error{}, LoginMaxLengthErr{e.maxLength})
+		return LoginMaxLengthErr{e.maxLength}
 	}
 	if e.minLength < uint(len(login)) && e.maxLength < uint(len(login)) {
-		return append([]error{}, LoginMinLengthErr{e.minLength})
+		return LoginMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type FirstNameSpecification interface {
-	IsValid(firstName string) []error
-}
-
 type FirstNameAndSpecification struct {
-	specifications []FirstNameSpecification
+	specifications map[string]Specification[string]
 }
 
 type FirstNameLengthValidation struct {
@@ -157,22 +219,18 @@ type FirstNameLengthValidation struct {
 	maxLength uint
 }
 
-func (e FirstNameLengthValidation) IsValid(name string) []error {
+func (e FirstNameLengthValidation) IsValid(name string) error {
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, FirstNameMaxLengthErr{e.maxLength})
+		return FirstNameMaxLengthErr{e.maxLength}
 	}
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, FirstNameMinLengthErr{e.minLength})
+		return FirstNameMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type SecondNameSpecification interface {
-	IsValid(secondName string) []error
-}
-
 type SecondNameAndSpecification struct {
-	specifications []SecondNameSpecification
+	specifications map[string]Specification[string]
 }
 
 type SecondNameLengthValidation struct {
@@ -180,22 +238,18 @@ type SecondNameLengthValidation struct {
 	maxLength uint
 }
 
-func (e SecondNameLengthValidation) IsValid(name string) []error {
+func (e SecondNameLengthValidation) IsValid(name string) error {
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, SecondNameMaxLengthErr{e.maxLength})
+		return SecondNameMaxLengthErr{e.maxLength}
 	}
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, SecondNameMinLengthErr{e.minLength})
+		return SecondNameMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type PatronimicSpecification interface {
-	IsValid(patronimic string) []error
-}
-
 type PatronimicAndSpecification struct {
-	specifications []PatronimicSpecification
+	specifications map[string]Specification[string]
 }
 
 type PatronimicLengthValidation struct {
@@ -203,41 +257,33 @@ type PatronimicLengthValidation struct {
 	maxLength uint
 }
 
-func (e PatronimicLengthValidation) IsValid(name string) []error {
+func (e PatronimicLengthValidation) IsValid(name string) error {
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, PatronimicMaxLengthErr{e.maxLength})
+		return PatronimicMaxLengthErr{e.maxLength}
 	}
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, PatronimicMinLengthErr{e.minLength})
+		return PatronimicMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type CompanyTypeSpecification interface {
-	IsValid(companyType string) []error
-}
-
 type CompanyTypeAndSpecification struct {
-	specifications []CompanyTypeSpecification
+	specifications map[string]Specification[string]
 }
 
 type CompanyTypeValidation struct {
 	companyType map[string]bool
 }
 
-func (e CompanyTypeValidation) IsValid(companyType string) []error {
+func (e CompanyTypeValidation) IsValid(companyType string) error {
 	if e.companyType[companyType] {
 		return nil
 	}
-	return append([]error{}, CompanyTypeErr{e.companyType})
-}
-
-type CompanyNameSpecification interface {
-	IsValid(companyName string) []error
+	return CompanyTypeErr{e.companyType}
 }
 
 type CompanyNameAndSpecification struct {
-	specifications []CompanyNameSpecification
+	specifications map[string]Specification[string]
 }
 
 type CompanyNameLengthValidation struct {
@@ -245,22 +291,18 @@ type CompanyNameLengthValidation struct {
 	maxLength uint
 }
 
-func (e CompanyNameLengthValidation) IsValid(name string) []error {
+func (e CompanyNameLengthValidation) IsValid(name string) error {
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, CompanyNameMaxLengthErr{e.maxLength})
+		return CompanyNameMaxLengthErr{e.maxLength}
 	}
 	if e.minLength < uint(len(name)) && e.maxLength < uint(len(name)) {
-		return append([]error{}, CompanyNameMinLengthErr{e.minLength})
+		return CompanyNameMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type AdressSpecification interface {
-	IsValid(adress string) []error
-}
-
 type AdressAndSpecification struct {
-	specifications []AdressSpecification
+	specifications map[string]Specification[string]
 }
 
 type AdressLengthValidation struct {
@@ -268,28 +310,24 @@ type AdressLengthValidation struct {
 	maxLength uint
 }
 
-func (e AdressLengthValidation) IsValid(adress string) []error {
+func (e AdressLengthValidation) IsValid(adress string) error {
 	if e.minLength < uint(len(adress)) && e.maxLength < uint(len(adress)) {
-		return append([]error{}, AdressMaxLengthErr{e.maxLength})
+		return AdressMaxLengthErr{e.maxLength}
 	}
 	if e.minLength < uint(len(adress)) && e.maxLength < uint(len(adress)) {
-		return append([]error{}, AdressMinLengthErr{e.minLength})
+		return AdressMinLengthErr{e.minLength}
 	}
 	return nil
 }
 
-type AvatarSpecification interface {
-	IsValid(avatar image.RGBA) []error
-}
-
 type AvatarAndSpecification struct {
-	specifications []AvatarSpecification
+	specifications map[string]Specification[string]
 }
 
 type AvatarWightValidation struct {
 	maxImageSize uint
 }
 
-func (e AvatarWightValidation) IsValid(avatar image.Image) []error {
-
+func (e AvatarWightValidation) IsValid(avatar string) error {
+	return nil
 }

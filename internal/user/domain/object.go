@@ -1,13 +1,13 @@
 package domain
 
-import "image"
-
 type Email string
 
 type Login string
 
 //Используется для хранения пароля в зашифрованном ввиде.
 type Password []byte
+
+type PhoneNumber string
 
 //Используется для хранения аккаунтов людей.
 //Первое поле - Фамилия, второе поле - Имя, третье поле - Отчество.
@@ -21,4 +21,4 @@ type CompanyName [2]string
 type Adress string
 
 //Используется для хранения изображений
-type Avatar image.Image
+type Avatar string

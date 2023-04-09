@@ -1,7 +1,5 @@
 package domain
 
-import "image"
-
 func CreateEmail(email string) Email {
 	return Email(email)
 }
@@ -14,16 +12,20 @@ func CreatePassword(password string) Password {
 	return Password(password)
 }
 
-func CreateFullName(second_name, first_name, patronimic string) FullName {
-	string_massive := [3]string{second_name, first_name, patronimic}
-	return FullName(string_massive)
+func CreatePhoneNumber(phoneNumber string) PhoneNumber {
+	return PhoneNumber(phoneNumber)
 }
 
-func CreateCompanyName(type_company, name string) CompanyName {
-	string_massive := [2]string{type_company, name}
-	return CompanyName(string_massive)
+func CreateFullName(secondName, firstName, patronimic string) FullName {
+	stringMassive := [3]string{secondName, firstName, patronimic}
+	return FullName(stringMassive)
 }
 
-func CreateAvatar(avatar image.Image) Avatar {
+func CreateCompanyName(typeCompany, name string) CompanyName {
+	stringMassive := [2]string{typeCompany, name}
+	return CompanyName(stringMassive)
+}
+
+func CreateAvatar(avatar string) Avatar {
 	return Avatar(avatar)
 }

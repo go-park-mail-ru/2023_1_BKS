@@ -4,7 +4,10 @@ info:
   title: AppUniq <service User> API
   description: OpenApi 3.0 для сервиса user сайта AppUniq.
 servers:
-  - url: https://appuniq.ru/api
+  - url: https://{hostname}/api
+    variables:
+      hostname:
+        default: localhost
 paths:
   /user:
     get:
@@ -23,21 +26,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
-              encoding:
-                Avatar:
-                  contentType: image/png, image/jpeg
     post:
       summary: Создать нового пользователя.
       operationId: createUser
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/CreateUser'
-            encoding:
-              Avatar:
-                contentType: image/png, image/jpeg
       responses:
         '201':
           description: Пользователь успешно создан.
@@ -53,12 +50,9 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/CreateUser'
-            encoding:
-              Avatar:
-                contentType: image/png, image/jpeg
       responses:
         '200':
           description: Пользователь успешно обновлён.
@@ -95,7 +89,6 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
       responses:
         '200':
           description: Пользователь получен.
@@ -103,9 +96,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetUser'
-              encoding:
-                Avatar:
-                  contentType: image/png, image/jpeg
         default:
           description: Произошла ошибка.
           content:
@@ -116,7 +106,6 @@ components:
   schemas:
     CreateUser:
       allOf:
-        - $ref: '#/components/schemas/CreateUser'
         - required:
             - Email
             - Login
@@ -128,14 +117,12 @@ components:
           properties:
             Email:
               type: string
-              format: email
               description: Email пользователя.
             Login:
               type: string
               description: Логин пользователя.
             PhoneNumber:
               type: string
-              format: phone
               description: Логин пользователя.
             SecondName:
               type: string
@@ -154,24 +141,20 @@ components:
               description: Проверка пароля пользователя.
             Avatar:
               type: string
-              format: binary
               description: Аватар пользователя.
     GetUser:
       allOf:
-        - $ref: '#/components/schemas/GetUser'
         - required:
-            - Id
+            - ID
             - PhoneNumber
             - SecondName
             - FirstName
           properties:
             ID:
               type: string
-              format: uuid
               description: Логин пользователя.
             PhoneNumber:
               type: string
-              format: number
               description: Логин пользователя.
             SecondName:
               type: string
@@ -184,7 +167,6 @@ components:
               description: Отчество пользователя.
             Avatar:
               type: string
-              format: binary
               description: Аватар пользователя.
 
     ErrorHTTP:

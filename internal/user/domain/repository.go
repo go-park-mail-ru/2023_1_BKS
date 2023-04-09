@@ -13,7 +13,7 @@ type CUDRepository interface {
 }
 
 type RRepository interface {
-	GetId(ctx context.Context, id uuid.UUID) (*User, error)
-	GetEmail(ctx context.Context, email Email) (*User, error)
-	GetLogin(ctx context.Context, login Login) (*User, error)
+	GetId(ctx context.Context, id uuid.UUID) (User, error)
+	GetEmail(ctx context.Context, email Email) (User, error)
+	GetLogin(ctx context.Context, login Login) (User, error)
 }

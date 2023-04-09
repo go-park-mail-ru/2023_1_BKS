@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"image"
-
 	"github.com/google/uuid"
 )
 
@@ -12,9 +10,9 @@ func CreateUser(
 	password,
 	firstName,
 	secondName,
-	patronimic string,
-	avatar image.Image,
-) (User, []error) {
+	patronimic,
+	avatar string,
+) (User, error) {
 	/*var allErr []error
 
 	if err := EmailAndSpecification.IsValid(email); err != nil {
