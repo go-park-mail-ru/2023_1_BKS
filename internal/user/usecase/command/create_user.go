@@ -9,8 +9,9 @@ import (
 )
 
 type CreateUserHandler struct {
-	userRepo domain.CUDRepository
-	loger    *logrus.Entry
+	userRepo  domain.CUDRepository
+	validator domain.SpecificationManager
+	loger     *logrus.Entry
 }
 
 func (h *CreateUserHandler) Handle(
@@ -28,6 +29,32 @@ func (h *CreateUserHandler) Handle(
 	if password != passwordCheck {
 		return domain.PassNonComporableErr{}
 	}
+
+	if err := h.validator.Email.IsValid(email); err != nil {
+		return err
+	}
+	if err := h.validator.Login.IsValid(login); err != nil {
+		return err
+	}
+	if err := h.validator.PhoneNumber.IsValid(phoneNumber); err != nil {
+		return err
+	}
+	if err := h.validator.FirstName.IsValid(firstName); err != nil {
+		return err
+	}
+	if err := h.validator.SecondName.IsValid(secondName); err != nil {
+		return err
+	}
+	if err := h.validator.Patronimic.IsValid(patronimic); err != nil {
+		return err
+	}
+	if err := h.validator.Password.IsValid(password); err != nil {
+		return err
+	}
+	if err := h.validator.Avatar.IsValid(avatar); err != nil {
+		return err
+	}
+
 	user := domain.User{
 		Id:          uuid.New(),
 		Email:       domain.CreateEmail(email),

@@ -9,8 +9,9 @@ import (
 )
 
 type DeleteUserHandler struct {
-	userRepo domain.CUDRepository
-	loger    *logrus.Entry
+	userRepo  domain.CUDRepository
+	validator domain.SpecificationManager
+	loger     *logrus.Entry
 }
 
 func (h *DeleteUserHandler) Handle(

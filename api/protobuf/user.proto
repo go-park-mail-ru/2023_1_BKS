@@ -18,6 +18,7 @@ message FullUser {
   string Patronimic = 6;
   string Password = 7;
   string PasswordCheck = 8;
+  string Avatar = 9;
 }
 
 message BaseUser {
@@ -25,6 +26,7 @@ message BaseUser {
   string SecondeName = 2;
   string FirstName = 3;
   string Patronimic = 4;
+  string Avatar = 5;
 }
 
 

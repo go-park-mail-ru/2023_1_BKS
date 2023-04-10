@@ -1,11 +1,11 @@
 CREATE TABLE users (
     Id uuid PRIMARY KEY,
-    Email varchar(20) NOT NULL UNIQUE,
-    PhoneNumber varchar(10) NOT NULL UNIQUE,
-    Login varchar(10) NOT NULL UNIQUE,
-    Password varchar(20) NOT NULL,
-    FirstName varchar(30) NOT NULL,
-    SecondName varchar(30) NOT NULL,
-    Patronimic varchar(30),
+    Email text NOT NULL UNIQUE,
+    PhoneNumber text NOT NULL UNIQUE,
+    Login text NOT NULL UNIQUE,
+    Password text NOT NULL,
+    FirstName text NOT NULL,
+    SecondName text NOT NULL,
+    Patronimic text,
     Avatar text
 );
