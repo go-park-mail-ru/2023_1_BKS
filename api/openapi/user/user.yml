@@ -111,9 +111,11 @@ components:
             - Login
             - PhoneNumber
             - SecondName
+            - Patronimic
             - FirstName
             - Password
             - PasswordCheck
+            - Avatar
           properties:
             Email:
               type: string
@@ -149,6 +151,8 @@ components:
             - PhoneNumber
             - SecondName
             - FirstName
+            - Patronimic
+            - Avatar
           properties:
             ID:
               type: string

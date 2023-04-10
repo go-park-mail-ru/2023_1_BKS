@@ -6,7 +6,7 @@ package v2
 // CreateUser defines model for CreateUser.
 type CreateUser struct {
 	// Avatar Аватар пользователя.
-	Avatar *string `json:"Avatar,omitempty"`
+	Avatar string `json:"Avatar"`
 
 	// Email Email пользователя.
 	Email string `json:"Email"`
@@ -24,7 +24,7 @@ type CreateUser struct {
 	PasswordCheck string `json:"PasswordCheck"`
 
 	// Patronimic Отчество пользователя.
-	Patronimic *string `json:"Patronimic,omitempty"`
+	Patronimic string `json:"Patronimic"`
 
 	// PhoneNumber Логин пользователя.
 	PhoneNumber string `json:"PhoneNumber"`
@@ -45,7 +45,7 @@ type ErrorHTTP struct {
 // GetUser defines model for GetUser.
 type GetUser struct {
 	// Avatar Аватар пользователя.
-	Avatar *string `json:"Avatar,omitempty"`
+	Avatar string `json:"Avatar"`
 
 	// FirstName Имя пользователя.
 	FirstName string `json:"FirstName"`
@@ -54,7 +54,7 @@ type GetUser struct {
 	ID string `json:"ID"`
 
 	// Patronimic Отчество пользователя.
-	Patronimic *string `json:"Patronimic,omitempty"`
+	Patronimic string `json:"Patronimic"`
 
 	// PhoneNumber Логин пользователя.
 	PhoneNumber string `json:"PhoneNumber"`

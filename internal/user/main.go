@@ -19,19 +19,14 @@ import (
 )
 
 func NewApplication(ctx context.Context) (app.Commands, app.Queries) {
-	/*postgresClient, err :=
-	if err != nil {
-		panic(err)
-	}
-	*/
-	var userRepository repository.UserCacheRepository
-	userRepository.New()
+	dsn := "user=appuniq dbname=user password=uniq123 host=127.0.0.1 port=5432 sslmode=disable"
+	userRepository := repository.CreatePostgressRepository(dsn)
 	logger := logrus.NewEntry(logrus.StandardLogger())
 
 	return app.Commands{
 			CreateUser: command.NewCreateUserHandler(&userRepository, logger),
-			/*UpdateUser: command.NewUpdateUserHandler(userRepository, logger),
-			DeleteUser: command.NewDeleteUserHandler(userRepository, logger),*/
+			UpdateUser: command.NewUpdateUserHandler(&userRepository, logger),
+			DeleteUser: command.NewDeleteUserHandler(&userRepository, logger),
 		},
 		app.Queries{
 			GetUser: query.NewGetIdUserHandler(userRepository, logger),
@@ -58,5 +53,4 @@ func main() {
 	e.Use(oapimiddleware.OapiRequestValidator(swagger))
 	v2.RegisterHandlers(e, &serverHandler)
 	e.Logger.Fatal(e.Start(fmt.Sprintf("0.0.0.0:%d", *port)))
-
 }

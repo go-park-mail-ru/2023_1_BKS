@@ -47,7 +47,7 @@ func (t *UserCacheRepository) Update(ctx context.Context, users domain.User) err
 	return nil
 }
 
-func (t *UserCacheRepository) Delete(ctx context.Context, users domain.User) error {
-	delete(t.users, users.Id)
+func (t *UserCacheRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	delete(t.users, id)
 	return nil
 }

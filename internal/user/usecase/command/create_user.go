@@ -15,16 +15,19 @@ type CreateUserHandler struct {
 
 func (h *CreateUserHandler) Handle(
 	ctx context.Context,
-	email string,
-	login string,
-	phoneNumber string,
-	secondName string,
-	firstName string,
-	patronimic string,
-	password string,
-	passwordCheck string,
+	email,
+	login,
+	phoneNumber,
+	secondName,
+	firstName,
+	patronimic,
+	password,
+	passwordCheck,
 	avatar string,
 ) error {
+	if password != passwordCheck {
+		return domain.PassNonComporableErr{}
+	}
 	user := domain.User{
 		Id:          uuid.New(),
 		Email:       domain.CreateEmail(email),
@@ -32,7 +35,7 @@ func (h *CreateUserHandler) Handle(
 		PhoneNumber: domain.CreatePhoneNumber(phoneNumber),
 		Password:    domain.CreatePassword(phoneNumber),
 		FullName:    domain.CreateFullName(secondName, firstName, patronimic),
-		Avatar:      domain.Avatar(avatar),
+		Avatar:      domain.CreateAvatar(avatar),
 	}
 	err := h.userRepo.Create(ctx, user)
 	return err

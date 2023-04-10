@@ -12,3 +12,17 @@ func NewCreateUserHandler(
 ) CreateUserHandler {
 	return CreateUserHandler{userRepo: userRepo, loger: loger}
 }
+
+func NewUpdateUserHandler(
+	userRepo domain.CUDRepository,
+	loger *logrus.Entry,
+) UpdateUserHandler {
+	return UpdateUserHandler{userRepo: userRepo, loger: loger}
+}
+
+func NewDeleteUserHandler(
+	userRepo domain.CUDRepository,
+	loger *logrus.Entry,
+) DeleteUserHandler {
+	return DeleteUserHandler{userRepo: userRepo, loger: loger}
+}

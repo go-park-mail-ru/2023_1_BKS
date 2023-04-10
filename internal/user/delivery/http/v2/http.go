@@ -35,8 +35,23 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
 	}
 	err = a.command.CreateUser.Handle(context.Background(), newUser.Email, newUser.Login, newUser.PhoneNumber,
-		newUser.SecondName, newUser.FirstName, *newUser.Patronimic, newUser.Password,
-		newUser.PasswordCheck, *newUser.Avatar)
+		newUser.SecondName, newUser.FirstName, newUser.Patronimic, newUser.Password,
+		newUser.PasswordCheck, newUser.Avatar)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+	return nil
+}
+
+func (a *HttpServer) UpdateUser(ctx echo.Context) error {
+	var updateUser CreateUser
+	err := ctx.Bind(&updateUser)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
+	}
+	err = a.command.UpdateUser.Handle(context.Background(), uuid.New(), updateUser.Email, updateUser.Login, updateUser.PhoneNumber,
+		updateUser.SecondName, updateUser.FirstName, updateUser.Patronimic, updateUser.Password,
+		updateUser.PasswordCheck, updateUser.Avatar) // // Значения uuid из авторизации
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
@@ -44,31 +59,47 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 }
 
 func (a *HttpServer) DeleteUser(ctx echo.Context) error {
-	return sendUserError(ctx, http.StatusBadRequest, "Произошла неизвестная ошибка")
-}
-
-func (a *HttpServer) UpdateUser(ctx echo.Context) error {
-	return sendUserError(ctx, http.StatusBadRequest, "Произошла неизвестная ошибка")
-}
-
-func (a *HttpServer) FindUserByID(ctx echo.Context, id string) error {
-	return sendUserError(ctx, http.StatusBadRequest, "Произошла неизвестная ошибка")
+	err := a.command.DeleteUser.Handle(context.Background(), uuid.New()) // Значения из авторизации
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+	return nil
 }
 
 func (a HttpServer) GetUser(ctx echo.Context) error {
 	var user domain.User
-	user, err := a.query.GetUser.Handle(context.Background(), uuid.New())
+	user, err := a.query.GetUser.Handle(context.Background(), uuid.New()) // Тут должен быть uuid из авторизации
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, "Произошла неизвестная ошибка")
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	avatar := string(user.Avatar)
 	result := GetUser{
 		ID:          user.Id.String(),
-		FirstName:   user.FullName[1],
-		SecondName:  user.FullName[0],
-		Patronimic:  &user.FullName[2],
-		PhoneNumber: string(user.PhoneNumber),
-		Avatar:      &avatar,
+		FirstName:   user.FullName.FirstName(),
+		SecondName:  user.FullName.SecondName(),
+		Patronimic:  user.FullName.Patronimic(),
+		PhoneNumber: user.PhoneNumber.String(),
+		Avatar:      user.Avatar.String(),
+	}
+	return ctx.JSON(http.StatusOK, result)
+}
+
+func (a *HttpServer) FindUserByID(ctx echo.Context, id string) error {
+	var user domain.User
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+	user, err = a.query.GetUser.Handle(context.Background(), uuid)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+	result := GetUser{
+		ID:          user.Id.String(),
+		FirstName:   user.FullName.FirstName(),
+		SecondName:  user.FullName.SecondName(),
+		Patronimic:  user.FullName.Patronimic(),
+		PhoneNumber: user.PhoneNumber.String(),
+		Avatar:      user.Avatar.String(),
 	}
 	return ctx.JSON(http.StatusOK, result)
 }

@@ -173,7 +173,7 @@ type CompanyTypeErr struct {
 
 func (e CompanyTypeErr) Error() string {
 	var str string
-	for typeComp, _ := range e.typeComp {
+	for typeComp := range e.typeComp {
 		str = fmt.Sprintf(str, typeComp, ", ")
 	}
 	str = str[0 : len(str)-3]
