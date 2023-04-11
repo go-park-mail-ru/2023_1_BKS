@@ -28,12 +28,12 @@ func NewApplication(ctx context.Context, cfg config.Config) (app.Commands, app.Q
 	logger := logrus.NewEntry(logrus.StandardLogger())
 
 	return app.Commands{
-			CreateUser: command.NewCreateUserHandler(&postRepository, validator, logger),
-			UpdateUser: command.NewUpdateUserHandler(&postRepository, validator, logger),
-			DeleteUser: command.NewDeleteUserHandler(&postRepository, validator, logger),
+			CreatePost: command.NewCreatePostHandler(&postRepository, validator, logger),
+			UpdatePost: command.NewUpdatePostHandler(&postRepository, validator, logger),
+			DeletePost: command.NewDeletePostHandler(&postRepository, validator, logger),
 		},
 		app.Queries{
-			GetUser: query.NewGetIdUserHandler(postRepository, logger),
+			GetPost: query.NewGetIdPostHandler(postRepository, logger),
 		}
 }
 

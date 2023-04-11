@@ -1,31 +1,17 @@
 package domain
 
-func CreateEmail(email string) Email {
-	return Email(email)
+func CreateImages(image []string) Images {
+	return Images(image)
 }
 
-func CreateLogin(login string) Login {
-	return Login(login)
+func CreateDescription(description string) Desciption {
+	return Desciption(description)
 }
 
-func CreatePassword(password string) Password {
-	return Password(password)
+func CreateTitle(title string) Title {
+	return Title(title)
 }
 
-func CreatePhoneNumber(phoneNumber string) PhoneNumber {
-	return PhoneNumber(phoneNumber)
-}
-
-func CreateFullName(secondName, firstName, patronimic string) FullName {
-	stringMassive := [3]string{secondName, firstName, patronimic}
-	return FullName(stringMassive)
-}
-
-func CreateCompanyName(typeCompany, name string) CompanyName {
-	stringMassive := [2]string{typeCompany, name}
-	return CompanyName(stringMassive)
-}
-
-func CreateAvatar(avatar string) Avatar {
-	return Avatar(avatar)
+func CreateTags(tags []string) Tags {
+	return Tags(tags)
 }

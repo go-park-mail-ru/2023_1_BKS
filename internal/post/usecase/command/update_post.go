@@ -8,61 +8,29 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type UpdateUserHandler struct {
+type UpdatePostHandler struct {
 	postRepo  domain.CUDRepository
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *UpdateUserHandler) Handle(
+func (h *UpdatePostHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
-	email,
-	login,
-	phoneNumber,
-	secondName,
-	firstName,
-	patronimic,
-	password,
-	passwordCheck,
-	avatar string,
+	title,
+	description string,
+	image []string,
+	tags []string,
 ) error {
-	if password != passwordCheck {
-		return domain.PassNonComporableErr{}
-	}
-
-	if err := h.validator.Email.IsValid(email); err != nil {
-		return err
-	}
-	if err := h.validator.Login.IsValid(login); err != nil {
-		return err
-	}
-	if err := h.validator.PhoneNumber.IsValid(phoneNumber); err != nil {
-		return err
-	}
-	if err := h.validator.FirstName.IsValid(firstName); err != nil {
-		return err
-	}
-	if err := h.validator.SecondName.IsValid(secondName); err != nil {
-		return err
-	}
-	if err := h.validator.Patronimic.IsValid(patronimic); err != nil {
-		return err
-	}
-	if err := h.validator.Password.IsValid(password); err != nil {
-		return err
-	}
-	if err := h.validator.Avatar.IsValid(avatar); err != nil {
+	if err := h.validator.Title.IsValid(title); err != nil {
 		return err
 	}
 
-	post := domain.User{
-		Email:       domain.CreateEmail(email),
-		Login:       domain.CreateLogin(login),
-		PhoneNumber: domain.CreatePhoneNumber(phoneNumber),
-		Password:    domain.CreatePassword(phoneNumber),
-		FullName:    domain.CreateFullName(secondName, firstName, patronimic),
-		Avatar:      domain.CreateAvatar(avatar),
+	post := domain.Post{
+		Title:      domain.CreateTitle(title),
+		Desciption: domain.CreateDescription(description),
+		Images:     domain.CreateImages(image),
+		Tags:       domain.CreateTags(tags),
 	}
 	err := h.postRepo.Update(ctx, post)
 	return err

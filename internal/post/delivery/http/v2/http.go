@@ -14,7 +14,7 @@ import (
 //go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../../api/openapi/post/models.cfg.yml ../../../../../api/openapi/post/post.yml
 //go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../../api/openapi/post/server.cfg.yml ../../../../../api/openapi/post/post.yml
 
-func sendUserError(ctx echo.Context, code int, message string) error {
+func sendPostError(ctx echo.Context, code int, message string) error {
 	postErr := ErrorHTTP{
 		Code:    int32(code),
 		Message: message,
@@ -28,78 +28,72 @@ type HttpServer struct {
 	query   app.Queries
 }
 
-func (a *HttpServer) CreateUser(ctx echo.Context) error {
-	var newUser CreateUser
-	err := ctx.Bind(&newUser)
+func (a *HttpServer) CreatePost(ctx echo.Context) error {
+	var newPost CreatePost
+	err := ctx.Bind(&newPost)
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
+		return sendPostError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
 	}
-	err = a.command.CreateUser.Handle(context.Background(), newUser.Email, newUser.Login, newUser.PhoneNumber,
-		newUser.SecondName, newUser.FirstName, newUser.Patronimic, newUser.Password,
-		newUser.PasswordCheck, newUser.Avatar)
+	err = a.command.CreatePost.Handle(context.Background(), newPost.Title, newPost.Desciption, newPost.Images, newPost.Tags)
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 	return nil
 }
 
-func (a *HttpServer) UpdateUser(ctx echo.Context) error {
-	var updateUser CreateUser
-	err := ctx.Bind(&updateUser)
+func (a *HttpServer) UpdatePost(ctx echo.Context) error {
+	var updatePost CreatePost
+	err := ctx.Bind(&updatePost)
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
+		return sendPostError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
 	}
-	err = a.command.UpdateUser.Handle(context.Background(), uuid.New(), updateUser.Email, updateUser.Login, updateUser.PhoneNumber,
-		updateUser.SecondName, updateUser.FirstName, updateUser.Patronimic, updateUser.Password,
-		updateUser.PasswordCheck, updateUser.Avatar) // // Значения uuid из авторизации
+	err = a.command.UpdatePost.Handle(context.Background(), uuid.New(), updatePost.Title, updatePost.Desciption, updatePost.Images, updatePost.Tags)
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 	return nil
 }
 
-func (a *HttpServer) DeleteUser(ctx echo.Context) error {
-	err := a.command.DeleteUser.Handle(context.Background(), uuid.New()) // Значения из авторизации
+func (a *HttpServer) DeletePost(ctx echo.Context) error {
+	err := a.command.DeletePost.Handle(context.Background(), uuid.New())
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 	return nil
 }
 
-func (a HttpServer) GetUser(ctx echo.Context) error {
-	var post domain.User
-	post, err := a.query.GetUser.Handle(context.Background(), uuid.New()) // Тут должен быть uuid из авторизации
+func (a HttpServer) GetPost(ctx echo.Context) error {
+	var post domain.Post
+	post, err := a.query.GetPost.Handle(context.Background(), uuid.New()) // Тут должен быть uuid из авторизации
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	result := GetUser{
-		ID:          post.Id.String(),
-		FirstName:   post.FullName.FirstName(),
-		SecondName:  post.FullName.SecondName(),
-		Patronimic:  post.FullName.Patronimic(),
-		PhoneNumber: post.PhoneNumber.String(),
-		Avatar:      post.Avatar.String(),
+	result := GetPost{
+		ID:         post.Id.String(),
+		Title:      post.Title.String(),
+		Desciption: post.Desciption.String(),
+		Images:     post.Images.String(),
+		Tags:       post.Tags.String(),
 	}
 	return ctx.JSON(http.StatusOK, result)
 }
 
-func (a *HttpServer) FindUserByID(ctx echo.Context, id string) error {
-	var post domain.User
+func (a *HttpServer) FindPostByID(ctx echo.Context, id string) error {
+	var post domain.Post
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	post, err = a.query.GetUser.Handle(context.Background(), uuid)
+	post, err = a.query.GetPost.Handle(context.Background(), uuid)
 	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	result := GetUser{
-		ID:          post.Id.String(),
-		FirstName:   post.FullName.FirstName(),
-		SecondName:  post.FullName.SecondName(),
-		Patronimic:  post.FullName.Patronimic(),
-		PhoneNumber: post.PhoneNumber.String(),
-		Avatar:      post.Avatar.String(),
+	result := GetPost{
+		ID:         post.Id.String(),
+		Title:      post.Title.String(),
+		Desciption: post.Desciption.String(),
+		Images:     post.Images.String(),
+		Tags:       post.Tags.String(),
 	}
 	return ctx.JSON(http.StatusOK, result)
 }

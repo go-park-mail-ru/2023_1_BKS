@@ -8,61 +8,42 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type CreateUserHandler struct {
+type CreatePostHandler struct {
 	postRepo  domain.CUDRepository
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *CreateUserHandler) Handle(
+func (h *CreatePostHandler) Handle(
 	ctx context.Context,
-	email,
-	login,
-	phoneNumber,
-	secondName,
-	firstName,
-	patronimic,
-	password,
-	passwordCheck,
-	avatar string,
+	title,
+	description string,
+	images []string,
+	tags []string,
 ) error {
-	if password != passwordCheck {
-		return domain.PassNonComporableErr{}
+	if err := h.validator.Title.IsValid(title); err != nil {
+		return err
+	}
+	if err := h.validator.Desciption.IsValid(description); err != nil {
+		return err
+	}
+	for i := 0; i < len(images); i++ {
+		if err := h.validator.Images.IsValid(images[i]); err != nil {
+			return err
+		}
+	}
+	for i := 0; i < len(images); i++ {
+		if err := h.validator.Tags.IsValid(tags[i]); err != nil {
+			return err
+		}
 	}
 
-	if err := h.validator.Email.IsValid(email); err != nil {
-		return err
-	}
-	if err := h.validator.Login.IsValid(login); err != nil {
-		return err
-	}
-	if err := h.validator.PhoneNumber.IsValid(phoneNumber); err != nil {
-		return err
-	}
-	if err := h.validator.FirstName.IsValid(firstName); err != nil {
-		return err
-	}
-	if err := h.validator.SecondName.IsValid(secondName); err != nil {
-		return err
-	}
-	if err := h.validator.Patronimic.IsValid(patronimic); err != nil {
-		return err
-	}
-	if err := h.validator.Password.IsValid(password); err != nil {
-		return err
-	}
-	if err := h.validator.Avatar.IsValid(avatar); err != nil {
-		return err
-	}
-
-	post := domain.User{
-		Id:          uuid.New(),
-		Email:       domain.CreateEmail(email),
-		Login:       domain.CreateLogin(login),
-		PhoneNumber: domain.CreatePhoneNumber(phoneNumber),
-		Password:    domain.CreatePassword(phoneNumber),
-		FullName:    domain.CreateFullName(secondName, firstName, patronimic),
-		Avatar:      domain.CreateAvatar(avatar),
+	post := domain.Post{
+		Id:         uuid.New(),
+		Title:      domain.CreateTitle(title),
+		Desciption: domain.CreateDescription(description),
+		Images:     domain.CreateImages(images),
+		Tags:       domain.CreateTags(tags),
 	}
 	err := h.postRepo.Create(ctx, post)
 	return err

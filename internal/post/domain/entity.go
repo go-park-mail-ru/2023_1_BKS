@@ -4,12 +4,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type User struct {
-	Id          uuid.UUID
-	Email       Email
-	Login       Login
-	PhoneNumber PhoneNumber
-	Password    Password
-	FullName    FullName
-	Avatar      Avatar
+type Post struct {
+	Id         uuid.UUID
+	UserID     uuid.UUID
+	Images     Images
+	Desciption Desciption
+	Title      Title
+	Tags       Tags
 }

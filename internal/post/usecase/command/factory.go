@@ -6,28 +6,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewCreateUserHandler(
+func NewCreatePostHandler(
 	postRepo domain.CUDRepository,
 	validator domain.SpecificationManager,
 	loger *logrus.Entry,
-) CreateUserHandler {
-	return CreateUserHandler{postRepo: postRepo,
+) CreatePostHandler {
+	return CreatePostHandler{postRepo: postRepo,
 		validator: validator, loger: loger}
 }
 
-func NewUpdateUserHandler(
+func NewUpdatePostHandler(
 	postRepo domain.CUDRepository,
 	validator domain.SpecificationManager,
 	loger *logrus.Entry,
-) UpdateUserHandler {
-	return UpdateUserHandler{postRepo: postRepo,
+) UpdatePostHandler {
+	return UpdatePostHandler{postRepo: postRepo,
 		validator: validator, loger: loger}
 }
 
-func NewDeleteUserHandler(
+func NewDeletePostHandler(
 	postRepo domain.CUDRepository,
 	validator domain.SpecificationManager,
 	loger *logrus.Entry,
-) DeleteUserHandler {
-	return DeleteUserHandler{postRepo: postRepo, validator: validator, loger: loger}
+) DeletePostHandler {
+	return DeletePostHandler{postRepo: postRepo, validator: validator, loger: loger}
 }

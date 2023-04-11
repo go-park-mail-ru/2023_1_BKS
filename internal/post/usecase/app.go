@@ -5,14 +5,14 @@ import (
 	"post/usecase/query"
 )
 
-//В данном агрегате перечисленны все команды сервиса объявлений
+// В данном агрегате перечисленны все команды сервиса объявлений
 type Commands struct {
-	CreateUser command.CreateUserHandler
-	UpdateUser command.UpdateUserHandler
-	DeleteUser command.DeleteUserHandler
+	CreatePost command.CreatePostHandler
+	UpdatePost command.UpdatePostHandler
+	DeletePost command.DeletePostHandler
 }
 
-//В данном агрегате перечисленны все запросы сервиса объявлений
+// В данном агрегате перечисленны все запросы сервиса объявлений
 type Queries struct {
-	GetUser query.GetIdUserHandler
+	GetPost query.GetIdPostHandler
 }

@@ -6,9 +6,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewGetIdUserHandler(
+func NewGetIdPostHandler(
 	postRepo domain.RRepository,
 	loger *logrus.Entry,
-) GetIdUserHandler {
-	return GetIdUserHandler{postRepo: postRepo, loger: loger}
+) GetIdPostHandler {
+	return GetIdPostHandler{postRepo: postRepo, loger: loger}
 }

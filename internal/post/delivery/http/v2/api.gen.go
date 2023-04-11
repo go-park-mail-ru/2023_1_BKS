@@ -20,21 +20,21 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Удалить пользователя.
-	// (DELETE /user)
-	DeleteUser(ctx echo.Context) error
-	// Вернуть данные пользователя.
-	// (GET /user)
-	GetUser(ctx echo.Context) error
-	// Создать нового пользователя.
-	// (POST /user)
-	CreateUser(ctx echo.Context) error
-	// Обновить пользователя.
+	// Удалить пост.
+	// (DELETE /post)
+	DeletePost(ctx echo.Context) error
+	// Вернуть данные поста.
+	// (GET /post)
+	GetPost(ctx echo.Context) error
+	// Создать новый пост.
+	// (POST /post)
+	CreatePost(ctx echo.Context) error
+	// Обновить пост.
 	// (PUT /user)
-	UpdateUser(ctx echo.Context) error
-	// Вернуть пользователя по id.
-	// (GET /user/{id})
-	FindUserByID(ctx echo.Context, id string) error
+	UpdatePost(ctx echo.Context) error
+	// Вернуть пост по id.
+	// (GET /post/{id})
+	FindPostByID(ctx echo.Context, id string) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -42,44 +42,44 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// DeleteUser converts echo context to params.
-func (w *ServerInterfaceWrapper) DeleteUser(ctx echo.Context) error {
+// DeletePost converts echo context to params.
+func (w *ServerInterfaceWrapper) DeletePost(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.DeleteUser(ctx)
+	err = w.Handler.DeletePost(ctx)
 	return err
 }
 
-// GetUser converts echo context to params.
-func (w *ServerInterfaceWrapper) GetUser(ctx echo.Context) error {
+// GetPost converts echo context to params.
+func (w *ServerInterfaceWrapper) GetPost(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.GetUser(ctx)
+	err = w.Handler.GetPost(ctx)
 	return err
 }
 
-// CreateUser converts echo context to params.
-func (w *ServerInterfaceWrapper) CreateUser(ctx echo.Context) error {
+// CreatePost converts echo context to params.
+func (w *ServerInterfaceWrapper) CreatePost(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.CreateUser(ctx)
+	err = w.Handler.CreatePost(ctx)
 	return err
 }
 
-// UpdateUser converts echo context to params.
-func (w *ServerInterfaceWrapper) UpdateUser(ctx echo.Context) error {
+// UpdatePost converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdatePost(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.UpdateUser(ctx)
+	err = w.Handler.UpdatePost(ctx)
 	return err
 }
 
-// FindUserByID converts echo context to params.
-func (w *ServerInterfaceWrapper) FindUserByID(ctx echo.Context) error {
+// FindPostByID converts echo context to params.
+func (w *ServerInterfaceWrapper) FindPostByID(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
 	var id string
@@ -90,7 +90,7 @@ func (w *ServerInterfaceWrapper) FindUserByID(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.FindUserByID(ctx, id)
+	err = w.Handler.FindPostByID(ctx, id)
 	return err
 }
 
@@ -122,11 +122,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.DELETE(baseURL+"/user", wrapper.DeleteUser)
-	router.GET(baseURL+"/user", wrapper.GetUser)
-	router.POST(baseURL+"/user", wrapper.CreateUser)
-	router.PUT(baseURL+"/user", wrapper.UpdateUser)
-	router.GET(baseURL+"/user/:id", wrapper.FindUserByID)
+	router.DELETE(baseURL+"/post", wrapper.DeletePost)
+	router.GET(baseURL+"/post", wrapper.GetPost)
+	router.POST(baseURL+"/post", wrapper.CreatePost)
+	router.PUT(baseURL+"/post", wrapper.UpdatePost)
+	router.GET(baseURL+"/post/:id", wrapper.FindPostByID)
 
 }
 

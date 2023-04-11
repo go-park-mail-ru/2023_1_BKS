@@ -8,13 +8,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type DeleteUserHandler struct {
+type DeletePostHandler struct {
 	postRepo  domain.CUDRepository
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *DeleteUserHandler) Handle(
+func (h *DeletePostHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
 ) error {
