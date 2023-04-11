@@ -1,0 +1,178 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: AppUniq <service Post> API
+  description: OpenApi 3.0 для сервиса post сайта AppUniq.
+servers:
+  - url: https://{hostname}/api
+    variables:
+      hostname:
+        default: localhost
+paths:
+  /post:
+    post:
+      summary: Создать новое объявление.
+      operationId: createPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePost'
+      responses:
+        '201':
+          description: Объявление успешно создано.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+  /post/{id}:
+    get:
+      summary: Вернуть пользователя по id.
+      operationId: findUserByID
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Пользователь получен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+    put:
+      summary: Обновить пользователя.
+      operationId: updatePost
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '200':
+          description: Пользователь успешно обновлён.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+    delete:
+      summary: Удалить пользователя.
+      operationId: deleteUser
+      responses:
+        '204':
+          description: Поьзователь удалён.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+components:
+  schemas:
+    Post:
+      allOf:
+        - required:
+            - Email
+            - Login
+            - PhoneNumber
+            - SecondName
+            - Patronimic
+            - FirstName
+            - Password
+            - PasswordCheck
+            - Avatar
+          properties:
+            Email:
+              type: string
+              description: Email пользователя.
+            Login:
+              type: string
+              description: Логин пользователя.
+            PhoneNumber:
+              type: string
+              description: Логин пользователя.
+            SecondName:
+              type: string
+              description: Фамилия пользователя.
+            FirstName:
+              type: string
+              description: Имя пользователя.
+            Patronimic:
+              type: string
+              description: Отчество пользователя.
+            Password:
+              type: string
+              description: Пароль пользователя.
+            PasswordCheck:
+              type: string
+              description: Проверка пароля пользователя.
+            Avatar:
+              type: string
+              description: Аватар пользователя.
+    GetUser:
+      allOf:
+        - required:
+            - ID
+            - PhoneNumber
+            - SecondName
+            - FirstName
+            - Patronimic
+            - Avatar
+          properties:
+            ID:
+              type: string
+              description: Логин пользователя.
+            PhoneNumber:
+              type: string
+              description: Логин пользователя.
+            SecondName:
+              type: string
+              description: Фамилия пользователя.
+            FirstName:
+              type: string
+              description: Имя пользователя.
+            Patronimic:
+              type: string
+              description: Отчество пользователя.
+            Avatar:
+              type: string
+              description: Аватар пользователя.
+
+    ErrorHTTP:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code
+        message:
+          type: string
+          description: Error message
