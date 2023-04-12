@@ -25,41 +25,29 @@ type DataBaseConfig struct {
 }
 
 type ValidConfig struct {
-	LoginValidate      LoginConfig
-	PasswordValidate   PasswordConfig
-	SecondNameValidate SecondNameConfig
-	FirstNameValidate  FirstNameConfig
-	PatronimicValidate PatronimicConfig
-	AvatarValidate     AvatarConfig
+	TitleValidate       TitleConfig
+	DescriptionValidate DescriptionConfig
+	ImagesValidate      ImagesConfig
+	TagsValidate        TagsConfig
 }
 
-type PasswordConfig struct {
-	SpecialChar map[rune]bool
-	MinLength   uint
-	MaxLength   uint
-}
-
-type LoginConfig struct {
-	MinLength           uint
-	MaxLength           uint
-	NonAcceptableValues map[rune]bool
-}
-
-type SecondNameConfig struct {
+type TitleConfig struct {
 	MinLength uint
 	MaxLength uint
 }
 
-type FirstNameConfig struct {
+type DescriptionConfig struct {
 	MinLength uint
 	MaxLength uint
 }
 
-type PatronimicConfig struct {
-	MinLength uint
-	MaxLength uint
+type ImagesConfig struct {
+	MinCount uint
+	MaxCount uint
+	Weigth   uint
 }
 
-type AvatarConfig struct {
-	Weigth uint
+type TagsConfig struct {
+	MinLength uint
+	MaxLength uint
 }

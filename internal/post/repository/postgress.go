@@ -4,55 +4,90 @@ import (
 	"context"
 	"database/sql"
 	"post/domain"
+	"time"
 
 	"github.com/google/uuid"
 )
 
-type UserPostgressRepository struct {
+type PostPostgressRepository struct {
 	posts *sql.DB
 }
 
-func (t UserPostgressRepository) Get(ctx context.Context, id uuid.UUID) (domain.Post, error) {
+func (t PostPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domain.Post, error) {
 	var (
-		email       string
-		login       string
-		phoneNumber string
-		secondName  string
-		firstName   string
-		patronimic  string
-		avatar      string
+		userID      uuid.UUID
+		title       string
+		description string
+		price       string
+		close       bool
+		time        time.Time
+		tags        []string
+		images      []string
 	)
 
-	row := t.posts.QueryRow("SELECT email, login, phonenumber, secondname, firstname, patronimic, avatar FROM posts WHERE id = $1 LIMIT 1", id)
-	err := row.Scan(&email, &login, &phoneNumber, &secondName, &firstName, &patronimic, &avatar)
+	row := t.posts.QueryRow("SELECT userid, title, description, price, close, tags, images, time FROM posts WHERE id = $1 LIMIT 1", id)
+	err := row.Scan(&userID, &title, &description, &price, &close, &tags, &images, &time)
 	return domain.Post{
-		Id:          id,
-		Email:       domain.CreateEmail(email),
-		Login:       domain.CreateLogin(login),
-		PhoneNumber: domain.CreatePhoneNumber(phoneNumber),
-		FullName:    domain.CreateFullName(secondName, firstName, patronimic),
-		Avatar:      domain.CreateAvatar(avatar),
+		Id:         id,
+		UserID:     userID,
+		Title:      domain.CreateTitle(title),
+		Desciption: domain.CreateDescription(description),
+		Price:      domain.CreatePrice(price),
+		Tags:       domain.CreateTags(tags),
+		Images:     domain.CreateImages(images),
+		Time:       domain.CreateTimeStamp(time),
 	}, err
 }
 
-func (t *UserPostgressRepository) Create(ctx context.Context, post domain.User) error {
-	_, err := t.posts.Exec("insert into posts (id, email,  phonenumber, login, password, firstname, secondname, patronimic, avatar) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-		post.Id, post.Email, post.PhoneNumber, post.Login, post.Password, post.FullName.FirstName(),
-		post.FullName.SecondName(), post.FullName.Patronimic(), post.Avatar)
-	// Должен возвращаться или ссесия или jwt токен
+func (t PostPostgressRepository) GetSortNew(ctx context.Context, number uint) (domain.Post, error) {
+	var (
+		id          uuid.UUID
+		userID      uuid.UUID
+		title       string
+		description string
+		price       string
+		close       bool
+		time        time.Time
+		tags        []string
+		images      []string
+	)
+
+	row := t.posts.QueryRow("SELECT id, userid, title, description, price, close, tags, images, time FROM posts ORDERED BY time LIMIT $1, 1", number-1)
+	err := row.Scan(&id, &userID, &title, &description, &price, &close, &tags, &images, &time)
+	return domain.Post{
+		Id:         id,
+		UserID:     userID,
+		Title:      domain.CreateTitle(title),
+		Desciption: domain.CreateDescription(description),
+		Price:      domain.CreatePrice(price),
+		Tags:       domain.CreateTags(tags),
+		Images:     domain.CreateImages(images),
+		Time:       domain.CreateTimeStamp(time),
+	}, err
+}
+
+func (t *PostPostgressRepository) Create(ctx context.Context, post domain.Post) error {
+	_, err := t.posts.Exec("insert into posts (id, userid, title, description, price, close, tags, images, time) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+		post.Id, post.UserID, post.Title.String(), post.Desciption.String(), post.Price.String(), post.Close.Bool(),
+		post.Tags.String(), post.Images.String(), post.Time.Time())
 	return err
 }
 
-func (t *UserPostgressRepository) Update(ctx context.Context, post domain.User) error {
+func (t *PostPostgressRepository) Update(ctx context.Context, post domain.Post) error {
 	id, _ := uuid.Parse("978137d3-a263-4dc7-9308-43e35c0c83ff") // Тут должго быть получение значений из авторизированного пользователя
-	_, err := t.posts.Exec("update posts set email = $1,  phonenumber = $2, login = $3, password = $4, firstname = $5, secondname = $6, patronimic = $7, avatar = $8 where id = $9",
-		post.Email, post.PhoneNumber, post.Login, post.Password, post.FullName.FirstName(),
-		post.FullName.SecondName(), post.FullName.Patronimic(), post.Avatar, id)
+	_, err := t.posts.Exec("update posts set  userid = $1, title = $2, description = $3, price = $4, close = $5, tags = $6, images = $7, time = $8 where id = $9",
+		post.UserID, post.Title, post.Desciption, post.Price, post.Close,
+		post.Tags.String(), post.Images.String(), post.Time.Time(), id)
 	return err
 }
 
-func (t *UserPostgressRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	_, err := t.posts.Exec("update posts set email = $1,  phonenumber = $2, login = $3, password = $4, firstname = $5, secondname = $6, patronimic = $7, avatar = $8 where id = $9", id)
-	//logout
+func (t *PostPostgressRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	_, err := t.posts.Exec("delete from posts where id = $1", id)
+	return err
+}
+
+func (t *PostPostgressRepository) Close(ctx context.Context, id uuid.UUID) error {
+	close := true
+	_, err := t.posts.Exec("update posts set close = $1 where id = &2", close, id)
 	return err
 }

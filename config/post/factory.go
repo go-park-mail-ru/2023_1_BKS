@@ -30,44 +30,23 @@ func CreateDataBaseConfig() DataBaseConfig {
 
 func CreateValidConfig() ValidConfig {
 	return ValidConfig{
-		LoginValidate:      CreateLoginConfig(),
-		PasswordValidate:   CreatePasswordConfig(),
-		SecondNameValidate: CreateSecondNameConfig(),
-		FirstNameValidate:  CreateFirstNameConfig(),
-		PatronimicValidate: CreatePatronimicConfig(),
-		AvatarValidate:     CreateAvatarConfig(),
+		TitleValidate:       CreateTitleConfig(),
+		DescriptionValidate: CreateDescriptionConfig(),
+		ImagesValidate:      CreateImagesConfig(),
 	}
 }
-
-func CreatePasswordConfig() PasswordConfig {
-	SpecialChar := make(map[rune]bool)
-	SpecialChar['/'] = true
-	SpecialChar['.'] = true
-	SpecialChar[','] = true
-	return PasswordConfig{SpecialChar, 0, 20}
+func CreateTitleConfig() TitleConfig {
+	return TitleConfig{5, 40}
 }
 
-func CreateLoginConfig() LoginConfig {
-	NonAcceptableValues := make(map[rune]bool)
-	NonAcceptableValues['/'] = true
-	NonAcceptableValues['.'] = true
-	NonAcceptableValues[','] = true
-	NonAcceptableValues['@'] = true
-	return LoginConfig{0, 20, NonAcceptableValues}
+func CreateDescriptionConfig() DescriptionConfig {
+	return DescriptionConfig{20, 150}
 }
 
-func CreateSecondNameConfig() SecondNameConfig {
-	return SecondNameConfig{0, 20}
+func CreateImagesConfig() ImagesConfig {
+	return ImagesConfig{1, 5, 20971520}
 }
 
-func CreateFirstNameConfig() FirstNameConfig {
-	return FirstNameConfig{0, 20}
-}
-
-func CreatePatronimicConfig() PatronimicConfig {
-	return PatronimicConfig{0, 20}
-}
-
-func CreateAvatarConfig() AvatarConfig {
-	return AvatarConfig{20971520}
+func CreateTagsConfig() TagsConfig {
+	return TagsConfig{1, 5}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type DeleteUserHandler struct {
-	postRepo  domain.CUDRepository
+	postRepo  domain.CUDRepositoryPost
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }

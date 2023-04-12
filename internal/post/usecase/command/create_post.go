@@ -8,61 +8,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type CreateUserHandler struct {
-	postRepo  domain.CUDRepository
+type CreatePostHandler struct {
+	postRepo  domain.CUDRepositoryPost
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *CreateUserHandler) Handle(
+func (h *CreatePostHandler) Handle(
 	ctx context.Context,
-	email,
-	login,
-	phoneNumber,
-	secondName,
-	firstName,
-	patronimic,
-	password,
-	passwordCheck,
-	avatar string,
+	postDelivery domain.PostBody,
 ) error {
-	if password != passwordCheck {
-		return domain.PassNonComporableErr{}
-	}
 
-	if err := h.validator.Email.IsValid(email); err != nil {
-		return err
-	}
-	if err := h.validator.Login.IsValid(login); err != nil {
-		return err
-	}
-	if err := h.validator.PhoneNumber.IsValid(phoneNumber); err != nil {
-		return err
-	}
-	if err := h.validator.FirstName.IsValid(firstName); err != nil {
-		return err
-	}
-	if err := h.validator.SecondName.IsValid(secondName); err != nil {
-		return err
-	}
-	if err := h.validator.Patronimic.IsValid(patronimic); err != nil {
-		return err
-	}
-	if err := h.validator.Password.IsValid(password); err != nil {
-		return err
-	}
-	if err := h.validator.Avatar.IsValid(avatar); err != nil {
-		return err
-	}
-
-	post := domain.User{
-		Id:          uuid.New(),
-		Email:       domain.CreateEmail(email),
-		Login:       domain.CreateLogin(login),
-		PhoneNumber: domain.CreatePhoneNumber(phoneNumber),
-		Password:    domain.CreatePassword(phoneNumber),
-		FullName:    domain.CreateFullName(secondName, firstName, patronimic),
-		Avatar:      domain.CreateAvatar(avatar),
+	post := domain.Post{
+		Id:         uuid.New(),
+		UserID:     postDelivery.UserID,
+		Title:      domain.CreateTitle(postDelivery.Title),
+		Desciption: domain.CreateDescription(postDelivery.Desciption),
+		Price:      domain.CreatePrice(postDelivery.Price),
+		Tags:       domain.CreateTags(postDelivery.Tags),
+		Images:     domain.CreateImages(postDelivery.Images),
+		Time:       domain.CreateTimeStamp(postDelivery.Time),
 	}
 	err := h.postRepo.Create(ctx, post)
 	return err
