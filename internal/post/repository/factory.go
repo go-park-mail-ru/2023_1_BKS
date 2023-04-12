@@ -21,7 +21,7 @@ func CreatePostgressRepository(dsn string) PostPostgressRepository {
 	return PostPostgressRepository{db}
 }
 
-func CreateRedisRepository(rdO redis.Options) CartRedisRepository {
-	client := redis.NewClient(&rdO)
-	return CartRedisRepository{client}
+func CreateRedisRepository(rdo redis.Options) CartRedisRepository {
+	client := redis.NewClient(&rdo)
+	return CartRedisRepository{posts: client}
 }

@@ -21,7 +21,7 @@ func (c *CartRedisRepository) Remove(ctx context.Context, cart domain.Cart) erro
 	return err
 }
 
-func (c CartRedisRepository) Get(ctx context.Context, cart domain.Cart) error {
-	err := c.posts.Sort()
+func (c CartRedisRepository) Get(ctx context.Context) ([]domain.Cart, error) {
+	err := c.posts.Sort(rg, redis.)
 	return err
 }

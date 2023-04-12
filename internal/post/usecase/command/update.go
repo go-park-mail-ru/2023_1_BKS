@@ -8,19 +8,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type CreatePostHandler struct {
+type UpdatePostHandler struct {
 	postRepo  domain.CUDRepositoryPost
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *CreatePostHandler) Handle(
+func (h *UpdatePostHandler) Handle(
 	ctx context.Context,
-	postDelivery domain.PostBody,
+	id uuid.UUID,
+	postDelivery domain.PostDeliveryInterface,
 ) error {
 
 	post := domain.Post{
-		Id:         uuid.New(),
+		Id:         id,
 		UserID:     postDelivery.UserID,
 		Title:      domain.CreateTitle(postDelivery.Title),
 		Desciption: domain.CreateDescription(postDelivery.Desciption),
@@ -30,5 +31,19 @@ func (h *CreatePostHandler) Handle(
 		Time:       domain.CreateTimeStamp(postDelivery.Time),
 	}
 	err := h.postRepo.Create(ctx, post)
+	return err
+}
+
+type ClosePostHandler struct {
+	postRepo  domain.CUDRepositoryPost
+	validator domain.SpecificationManager
+	loger     *logrus.Entry
+}
+
+func (h *ClosePostHandler) Handle(
+	ctx context.Context,
+	id uuid.UUID,
+) error {
+	err := h.postRepo.Close(ctx, id)
 	return err
 }
