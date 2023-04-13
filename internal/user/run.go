@@ -60,11 +60,6 @@ func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) erro
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	<-interrupt
 
-	timeout := time.Duration(10)
-	if timeout == 0 {
-		timeout = 10 * time.Second
-	}
-
 	server.GracefulStop()
 
 	return nil
@@ -73,12 +68,19 @@ func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) erro
 func Run(cfg config.Config) {
 
 	ctx := context.Background()
+
 	swagger, err := v2.GetSwagger()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Ошибка загрузки спецификации swagger\n: %s", err)
 		os.Exit(1)
 	}
 	swagger.Servers = nil
+
+	lis, err := net.Listen("tcp", ":8081")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+		os.Exit(1)
+	}
 
 	command, query := usecase.NewUsecase(ctx, cfg)
 
@@ -94,25 +96,17 @@ func Run(cfg config.Config) {
 
 	v2.RegisterHandlers(e, &serverHandler)
 
-	errs := make(chan error, 1)
+	serverGrpc.RegisterUserServer(server, &grpcHandler)
+
+	errs := make(chan error, 2)
 	go func() {
 		errs <- AsyncRunHTTP(e, cfg)
 	}()
-	errc := <-errs
 
-	lis, err := net.Listen("tcp", ":8081")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
-		os.Exit(1)
-	}
-
-	serverGrpc.RegisterUserServer(server, &grpcHandler)
-
-	errg := make(chan error, 1)
 	go func() {
-		errg <- AsyncRunGrpc(server, lis, cfg)
+		errs <- AsyncRunGrpc(server, lis, cfg)
 	}()
-	errt := <-errg
+	err = <-errs
 
-	log.Warn("Terminating aplication:", errc, errt)
+	log.Warn("Terminating aplication:", err)
 }
