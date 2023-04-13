@@ -16,53 +16,52 @@ type CreateUserHandler struct {
 
 func (h *CreateUserHandler) Handle(
 	ctx context.Context,
-	email,
-	login,
-	phoneNumber,
-	secondName,
-	firstName,
-	patronimic,
-	password,
-	passwordCheck,
-	avatar string,
+	passwordCheck string,
+	userDelivery domain.User,
 ) error {
-	if password != passwordCheck {
+	if userDelivery.Password != passwordCheck {
 		return domain.PassNonComporableErr{}
 	}
 
-	if err := h.validator.Email.IsValid(email); err != nil {
+	if err := h.validator.Email.IsValid(userDelivery.Email); err != nil {
 		return err
 	}
-	if err := h.validator.Login.IsValid(login); err != nil {
+	if err := h.validator.Login.IsValid(userDelivery.Login); err != nil {
 		return err
 	}
-	if err := h.validator.PhoneNumber.IsValid(phoneNumber); err != nil {
+	if err := h.validator.PhoneNumber.IsValid(userDelivery.PhoneNumber); err != nil {
 		return err
 	}
-	if err := h.validator.FirstName.IsValid(firstName); err != nil {
+	if err := h.validator.FirstName.IsValid(userDelivery.FirstName); err != nil {
 		return err
 	}
-	if err := h.validator.SecondName.IsValid(secondName); err != nil {
+	if err := h.validator.SecondName.IsValid(userDelivery.SecondName); err != nil {
 		return err
 	}
-	if err := h.validator.Patronimic.IsValid(patronimic); err != nil {
+	if err := h.validator.Patronimic.IsValid(userDelivery.Patronimic); err != nil {
 		return err
 	}
-	if err := h.validator.Password.IsValid(password); err != nil {
+	if err := h.validator.Password.IsValid(userDelivery.Password); err != nil {
 		return err
 	}
-	if err := h.validator.Avatar.IsValid(avatar); err != nil {
+	if err := h.validator.Avatar.IsValid(userDelivery.PathToAvatar); err != nil {
 		return err
 	}
 
 	user := domain.User{
-		Id:          uuid.New(),
-		Email:       domain.CreateEmail(email),
-		Login:       domain.CreateLogin(login),
-		PhoneNumber: domain.CreatePhoneNumber(phoneNumber),
-		Password:    domain.CreatePassword(phoneNumber),
-		FullName:    domain.CreateFullName(secondName, firstName, patronimic),
-		Avatar:      domain.CreateAvatar(avatar),
+		Id: uuid.New(),
+
+		Email:       userDelivery.Email,
+		PhoneNumber: userDelivery.PhoneNumber,
+
+		Login:    userDelivery.Login,
+		Password: userDelivery.Password,
+
+		SecondName: userDelivery.SecondName,
+		FirstName:  userDelivery.FirstName,
+		Patronimic: userDelivery.Patronimic,
+
+		PathToAvatar: userDelivery.PathToAvatar,
 	}
 	err := h.userRepo.Create(ctx, user)
 	return err

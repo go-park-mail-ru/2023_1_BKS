@@ -13,5 +13,5 @@ type CUDRepository interface {
 }
 
 type RRepository interface {
-	Get(ctx context.Context, id uuid.UUID) (User, error)
+	GetId(ctx context.Context, id uuid.UUID) (User, error)
 }

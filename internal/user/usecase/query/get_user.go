@@ -17,5 +17,5 @@ func (h GetIdUserHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
 ) (domain.User, error) {
-	return h.userRepo.Get(ctx, id)
+	return h.userRepo.GetId(ctx, id)
 }

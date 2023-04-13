@@ -30,13 +30,29 @@ type HttpServer struct {
 
 func (a *HttpServer) CreateUser(ctx echo.Context) error {
 	var newUser CreateUser
+
 	err := ctx.Bind(&newUser)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
 	}
-	err = a.command.CreateUser.Handle(context.Background(), newUser.Email, newUser.Login, newUser.PhoneNumber,
-		newUser.SecondName, newUser.FirstName, newUser.Patronimic, newUser.Password,
-		newUser.PasswordCheck, newUser.Avatar)
+
+	user := domain.User{
+		Id: uuid.New(),
+
+		Email:       newUser.Email,
+		PhoneNumber: newUser.PhoneNumber,
+
+		Login:    newUser.Login,
+		Password: newUser.Password,
+
+		SecondName: newUser.SecondName,
+		FirstName:  newUser.FirstName,
+		Patronimic: newUser.Patronimic,
+
+		PathToAvatar: newUser.Avatar,
+	}
+
+	err = a.command.CreateUser.Handle(context.Background(), newUser.PasswordCheck, user)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
@@ -45,16 +61,33 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 
 func (a *HttpServer) UpdateUser(ctx echo.Context) error {
 	var updateUser CreateUser
+
 	err := ctx.Bind(&updateUser)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
 	}
-	err = a.command.UpdateUser.Handle(context.Background(), uuid.New(), updateUser.Email, updateUser.Login, updateUser.PhoneNumber,
-		updateUser.SecondName, updateUser.FirstName, updateUser.Patronimic, updateUser.Password,
-		updateUser.PasswordCheck, updateUser.Avatar) // // Значения uuid из авторизации
+
+	user := domain.User{
+		Id: uuid.New(), // Значения uuid из авторизации
+
+		Email:       updateUser.Email,
+		PhoneNumber: updateUser.PhoneNumber,
+
+		Login:    updateUser.Login,
+		Password: updateUser.Password,
+
+		SecondName: updateUser.SecondName,
+		FirstName:  updateUser.FirstName,
+		Patronimic: updateUser.Patronimic,
+
+		PathToAvatar: updateUser.Avatar,
+	}
+
+	err = a.command.UpdateUser.Handle(context.Background(), user)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
+
 	return nil
 }
 
@@ -74,11 +107,11 @@ func (a HttpServer) GetUser(ctx echo.Context) error {
 	}
 	result := GetUser{
 		ID:          user.Id.String(),
-		FirstName:   user.FullName.FirstName(),
-		SecondName:  user.FullName.SecondName(),
-		Patronimic:  user.FullName.Patronimic(),
-		PhoneNumber: user.PhoneNumber.String(),
-		Avatar:      user.Avatar.String(),
+		SecondName:  user.SecondName,
+		FirstName:   user.FirstName,
+		Patronimic:  user.Patronimic,
+		PhoneNumber: user.PhoneNumber,
+		Avatar:      user.PathToAvatar,
 	}
 	return ctx.JSON(http.StatusOK, result)
 }
@@ -95,11 +128,11 @@ func (a *HttpServer) FindUserByID(ctx echo.Context, id string) error {
 	}
 	result := GetUser{
 		ID:          user.Id.String(),
-		FirstName:   user.FullName.FirstName(),
-		SecondName:  user.FullName.SecondName(),
-		Patronimic:  user.FullName.Patronimic(),
-		PhoneNumber: user.PhoneNumber.String(),
-		Avatar:      user.Avatar.String(),
+		SecondName:  user.SecondName,
+		FirstName:   user.FirstName,
+		Patronimic:  user.Patronimic,
+		PhoneNumber: user.PhoneNumber,
+		Avatar:      user.PathToAvatar,
 	}
 	return ctx.JSON(http.StatusOK, result)
 }
