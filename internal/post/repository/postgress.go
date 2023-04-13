@@ -22,20 +22,20 @@ func (t PostPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domai
 		close       bool
 		time        time.Time
 		tags        []string
-		images      []string
+		pathImages  []string
 	)
 
 	row := t.posts.QueryRow("SELECT userid, title, description, price, close, tags, images, time FROM posts WHERE id = $1 LIMIT 1", id)
-	err := row.Scan(&userID, &title, &description, &price, &close, &tags, &images, &time)
+	err := row.Scan(&userID, &title, &description, &price, &close, &tags, &pathImages, &time)
 	return domain.Post{
 		Id:         id,
 		UserID:     userID,
-		Title:      domain.CreateTitle(title),
-		Desciption: domain.CreateDescription(description),
-		Price:      domain.CreatePrice(price),
-		Tags:       domain.CreateTags(tags),
-		Images:     domain.CreateImages(images),
-		Time:       domain.CreateTimeStamp(time),
+		Title:      title,
+		Desciption: description,
+		Price:      price,
+		Tags:       tags,
+		PathImages: pathImages,
+		Time:       time,
 	}, err
 }
 
@@ -57,19 +57,19 @@ func (t PostPostgressRepository) GetSortNew(ctx context.Context, number uint) (d
 	return domain.Post{
 		Id:         id,
 		UserID:     userID,
-		Title:      domain.CreateTitle(title),
-		Desciption: domain.CreateDescription(description),
-		Price:      domain.CreatePrice(price),
-		Tags:       domain.CreateTags(tags),
-		Images:     domain.CreateImages(images),
-		Time:       domain.CreateTimeStamp(time),
+		Title:      title,
+		Desciption: description,
+		Price:      price,
+		Tags:       tags,
+		PathImages: images,
+		Time:       time,
 	}, err
 }
 
 func (t *PostPostgressRepository) Create(ctx context.Context, post domain.Post) error {
 	_, err := t.posts.Exec("insert into posts (id, userid, title, description, price, close, tags, images, time) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-		post.Id, post.UserID, post.Title.String(), post.Desciption.String(), post.Price.String(), post.Close.Bool(),
-		post.Tags.String(), post.Images.String(), post.Time.Time())
+		post.Id, post.UserID, post.Title, post.Desciption, post.Price, post.Close,
+		post.Tags, post.PathImages, post.Time)
 	return err
 }
 
@@ -77,7 +77,7 @@ func (t *PostPostgressRepository) Update(ctx context.Context, post domain.Post) 
 	id, _ := uuid.Parse("978137d3-a263-4dc7-9308-43e35c0c83ff") // Тут должго быть получение значений из авторизированного пользователя
 	_, err := t.posts.Exec("update posts set  userid = $1, title = $2, description = $3, price = $4, close = $5, tags = $6, images = $7, time = $8 where id = $9",
 		post.UserID, post.Title, post.Desciption, post.Price, post.Close,
-		post.Tags.String(), post.Images.String(), post.Time.Time(), id)
+		post.Tags, post.PathImages, post.Time, id)
 	return err
 }
 

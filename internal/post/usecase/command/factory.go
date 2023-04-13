@@ -6,52 +6,36 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewCreatePostHandler(
-	postRepo domain.CUDRepositoryPost,
+func NewCreateHandler(
+	postRepo domain.CUDRepository,
 	validator domain.SpecificationManager,
 	loger *logrus.Entry,
-) CreatePostHandler {
-	return CreatePostHandler{postRepo: postRepo,
+) CreateHandler {
+	return CreateHandler{postRepo: postRepo,
 		validator: validator, loger: loger}
 }
 
-func NewUpdatePostHandler(
-	postRepo domain.CUDRepositoryPost,
+func NewUpdateHandler(
+	postRepo domain.CUDRepository,
 	validator domain.SpecificationManager,
 	loger *logrus.Entry,
-) UpdatePostHandler {
-	return UpdatePostHandler{postRepo: postRepo,
+) UpdateHandler {
+	return UpdateHandler{postRepo: postRepo,
 		validator: validator, loger: loger}
 }
 
-func NewDeletePostHandler(
-	postRepo domain.CUDRepositoryPost,
+func NewDeleteHandler(
+	postRepo domain.CUDRepository,
 	validator domain.SpecificationManager,
 	loger *logrus.Entry,
-) DeletePostHandler {
-	return DeletePostHandler{postRepo: postRepo, validator: validator, loger: loger}
+) DeleteHandler {
+	return DeleteHandler{postRepo: postRepo, validator: validator, loger: loger}
 }
 
-func NewClosePostHandler(
-	postRepo domain.CUDRepositoryPost,
+func NewCloseHandler(
+	postRepo domain.CUDRepository,
 	validator domain.SpecificationManager,
 	loger *logrus.Entry,
-) ClosePostHandler {
-	return ClosePostHandler{postRepo: postRepo, validator: validator, loger: loger}
-}
-
-func NewAddCartHandler(
-	cartRepo domain.CUDRepositoryCart,
-	validator domain.SpecificationManager,
-	loger *logrus.Entry,
-) AddCartHandler {
-	return AddCartHandler{cartRepo: cartRepo, validator: validator, loger: loger}
-}
-
-func NewRemoveCartHandler(
-	cartRepo domain.CUDRepositoryCart,
-	validator domain.SpecificationManager,
-	loger *logrus.Entry,
-) RemoveCartHandler {
-	return RemoveCartHandler{cartRepo: cartRepo, validator: validator, loger: loger}
+) CloseHandler {
+	return CloseHandler{postRepo: postRepo, validator: validator, loger: loger}
 }

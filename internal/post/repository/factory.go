@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
 )
 
@@ -19,9 +18,4 @@ func CreatePostgressRepository(dsn string) PostPostgressRepository {
 	}
 	db.SetMaxOpenConns(10)
 	return PostPostgressRepository{db}
-}
-
-func CreateRedisRepository(rdo redis.Options) CartRedisRepository {
-	client := redis.NewClient(&rdo)
-	return CartRedisRepository{posts: client}
 }

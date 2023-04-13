@@ -8,47 +8,27 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type CreatePostHandler struct {
-	postRepo  domain.CUDRepositoryPost
+type CreateHandler struct {
+	postRepo  domain.CUDRepository
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *CreatePostHandler) Handle(
+func (h *CreateHandler) Handle(
 	ctx context.Context,
-	postDelivery domain.PostDeliveryInterface,
+	postDelivery domain.Post,
 ) error {
-
+	//Тут должна быть валидация
 	post := domain.Post{
 		Id:         uuid.New(),
 		UserID:     postDelivery.UserID,
-		Title:      domain.CreateTitle(postDelivery.Title),
-		Desciption: domain.CreateDescription(postDelivery.Desciption),
-		Price:      domain.CreatePrice(postDelivery.Price),
-		Tags:       domain.CreateTags(postDelivery.Tags),
-		Images:     domain.CreateImages(postDelivery.Images),
-		Time:       domain.CreateTimeStamp(postDelivery.Time),
+		Title:      postDelivery.Title,
+		Desciption: postDelivery.Desciption,
+		Price:      postDelivery.Price,
+		Tags:       postDelivery.Tags,
+		PathImages: postDelivery.PathImages,
+		Time:       postDelivery.Time,
 	}
 	err := h.postRepo.Create(ctx, post)
-	return err
-}
-
-type AddCartHandler struct {
-	cartRepo  domain.CUDRepositoryCart
-	validator domain.SpecificationManager
-	loger     *logrus.Entry
-}
-
-func (h *AddCartHandler) Handle(
-	ctx context.Context,
-	idPost string,
-	title string,
-) error {
-
-	cart := domain.Cart{
-		IdPost: uuid.New(),
-		Title:  domain.CreateTitle(title),
-	}
-	err := h.cartRepo.Add(ctx, cart)
 	return err
 }

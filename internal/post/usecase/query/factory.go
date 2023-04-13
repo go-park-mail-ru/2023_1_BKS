@@ -6,23 +6,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewGetIdPostHandler(
-	postRepo domain.RRepositoryPost,
+func NewGetIdHandler(
+	postRepo domain.RRepository,
 	loger *logrus.Entry,
-) GetIdPostHandler {
-	return GetIdPostHandler{postRepo: postRepo, loger: loger}
+) GetIdHandler {
+	return GetIdHandler{postRepo: postRepo, loger: loger}
 }
 
-func NewGetSortNewPostHandler(
-	postRepo domain.RRepositoryPost,
+func NewGetSortNewHandler(
+	postRepo domain.RRepository,
 	loger *logrus.Entry,
-) GetSortNewPostHandler {
-	return GetSortNewPostHandler{postRepo: postRepo, loger: loger}
-}
-
-func NewGetCartHandler(
-	cartRepo domain.RRepositoryCart,
-	loger *logrus.Entry,
-) GetCartHandler {
-	return GetCartHandler{cartRepo: cartRepo, loger: loger}
+) GetSortNewHandler {
+	return GetSortNewHandler{postRepo: postRepo, loger: loger}
 }

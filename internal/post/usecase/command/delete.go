@@ -8,30 +8,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type DeletePostHandler struct {
-	postRepo  domain.CUDRepositoryPost
+type DeleteHandler struct {
+	postRepo  domain.CUDRepository
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *DeletePostHandler) Handle(
+func (h *DeleteHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
 ) error {
 	err := h.postRepo.Delete(ctx, id)
-	return err
-}
-
-type RemoveCartHandler struct {
-	cartRepo  domain.CUDRepositoryCart
-	validator domain.SpecificationManager
-	loger     *logrus.Entry
-}
-
-func (h *RemoveCartHandler) Handle(
-	ctx context.Context,
-	cart domain.Cart,
-) error {
-	err := h.cartRepo.Remove(ctx, cart)
 	return err
 }

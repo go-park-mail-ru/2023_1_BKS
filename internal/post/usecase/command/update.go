@@ -8,39 +8,39 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type UpdatePostHandler struct {
-	postRepo  domain.CUDRepositoryPost
+type UpdateHandler struct {
+	postRepo  domain.CUDRepository
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *UpdatePostHandler) Handle(
+func (h *UpdateHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
-	postDelivery domain.PostDeliveryInterface,
+	postDelivery domain.Post,
 ) error {
-
+	//Тут должна быть валидация
 	post := domain.Post{
 		Id:         id,
 		UserID:     postDelivery.UserID,
-		Title:      domain.CreateTitle(postDelivery.Title),
-		Desciption: domain.CreateDescription(postDelivery.Desciption),
-		Price:      domain.CreatePrice(postDelivery.Price),
-		Tags:       domain.CreateTags(postDelivery.Tags),
-		Images:     domain.CreateImages(postDelivery.Images),
-		Time:       domain.CreateTimeStamp(postDelivery.Time),
+		Title:      postDelivery.Title,
+		Desciption: postDelivery.Desciption,
+		Price:      postDelivery.Price,
+		Tags:       postDelivery.Tags,
+		PathImages: postDelivery.PathImages,
+		Time:       postDelivery.Time,
 	}
-	err := h.postRepo.Create(ctx, post)
+	err := h.postRepo.Update(ctx, post)
 	return err
 }
 
-type ClosePostHandler struct {
-	postRepo  domain.CUDRepositoryPost
+type CloseHandler struct {
+	postRepo  domain.CUDRepository
 	validator domain.SpecificationManager
 	loger     *logrus.Entry
 }
 
-func (h *ClosePostHandler) Handle(
+func (h *CloseHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
 ) error {

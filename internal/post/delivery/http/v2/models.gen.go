@@ -18,6 +18,25 @@ type ErrorHTTP struct {
 	Message string `json:"message"`
 }
 
+// GetPost defines model for GetPost.
+type GetPost struct {
+	// Close Закрыто ли объявление.
+	Close bool `json:"Close"`
+
+	// Description Содержание объявления.
+	Description  string       `json:"Description"`
+	ImageMassive ImageMassive `json:"ImageMassive"`
+
+	// Price Цена объявления.
+	Price string `json:"Price"`
+
+	// Title Названия объявления.
+	Title string `json:"Title"`
+
+	// UserId Названия объявления.
+	UserId string `json:"UserId"`
+}
+
 // ImageMassive defines model for ImageMassive.
 type ImageMassive = []ImageMassive_Item
 
@@ -46,16 +65,10 @@ type Post struct {
 
 	// Title Названия объявления.
 	Title string `json:"Title"`
-}
 
-// PostId defines model for PostId.
-type PostId struct {
-	// Id Идентификатор объявления.
-	Id string `json:"Id"`
+	// UserId Названия объявления.
+	UserId string `json:"UserId"`
 }
-
-// AddCartJSONRequestBody defines body for AddCart for application/json ContentType.
-type AddCartJSONRequestBody = PostId
 
 // CreatePostJSONRequestBody defines body for CreatePost for application/json ContentType.
 type CreatePostJSONRequestBody = Post

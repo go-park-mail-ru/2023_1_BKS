@@ -8,37 +8,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type GetIdPostHandler struct {
-	postRepo domain.RRepositoryPost
+type GetIdHandler struct {
+	postRepo domain.RRepository
 	loger    *logrus.Entry
 }
 
-func (h GetIdPostHandler) Handle(
+func (h GetIdHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
 ) (domain.Post, error) {
 	return h.postRepo.GetId(ctx, id)
 }
 
-type GetSortNewPostHandler struct {
-	postRepo domain.RRepositoryPost
+type GetSortNewHandler struct {
+	postRepo domain.RRepository
 	loger    *logrus.Entry
 }
 
-func (h GetSortNewPostHandler) Handle(
+func (h GetSortNewHandler) Handle(
 	ctx context.Context,
 	number uint,
 ) (domain.Post, error) {
 	return h.postRepo.GetSortNew(ctx, number)
-}
-
-type GetCartHandler struct {
-	cartRepo domain.RRepositoryCart
-	loger    *logrus.Entry
-}
-
-func (h GetCartHandler) Handle(
-	ctx context.Context,
-) ([]domain.Cart, error) {
-	return h.cartRepo.Get(ctx)
 }
