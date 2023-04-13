@@ -13,6 +13,8 @@ paths:
     get:
       summary: Вернуть данные пользователя.
       operationId: getUser
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: Ок.
@@ -38,6 +40,10 @@ paths:
       responses:
         '201':
           description: Пользователь успешно создан.
+          content:
+            application/jwt:
+              schema:
+                $ref: '#/components/schemas/JsonWebToken'
         default:
           description: Произошла ошибка.
           content:
@@ -47,6 +53,8 @@ paths:
     put:
       summary: Обновить пользователя.
       operationId: updateUser
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -68,6 +76,8 @@ paths:
                 $ref: '#/components/schemas/ErrorHTTP'
     delete:
       summary: Удалить пользователя.
+      security:
+      - bearerAuth: []
       operationId: deleteUser
       responses:
         '204':
@@ -102,6 +112,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
+                
+
 components:
   schemas:
     CreateUser:
@@ -172,7 +184,7 @@ components:
             Avatar:
               type: string
               description: Аватар пользователя.
-
+        
     ErrorHTTP:
       required:
         - code
@@ -185,3 +197,22 @@ components:
         message:
           type: string
           description: Error message
+          
+    JsonWebToken:
+      description: |
+        JWT is built in the following format:
+          f"base64urlEncoding(header) + '.' + base64urlEncoding(payload) + '.' + base64urlEncoding(signature)"
+        header is an object containing -> {"alg": {CHOSEN_ALG}, "typ": "JWT"}
+        payload is an object containing the claims (data of jwt)
+        signature is an encoded with a PRIVATE_KEY object by our CHOSEN_ALG from the following format: 
+          CHOSEN_ALG( PRIVATE_KEY, base64urlEncoding(header) + '.' + base64urlEncoding(payload))
+      type: string
+      format: application/jwt
+      pattern: ^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]+)$
+      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+          
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

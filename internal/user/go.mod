@@ -16,6 +16,8 @@ require (
 )
 
 require (
+	github.com/labstack/echo-jwt v0.0.0-20221127215225-c84d41a71003 // indirect
+	github.com/lestrrat-go/jwx v1.2.25 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect

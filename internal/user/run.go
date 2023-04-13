@@ -3,6 +3,7 @@ package user
 import (
 	"config"
 	"context"
+	"crypto/subtle"
 	"fmt"
 	"net"
 	"net/http"
@@ -91,6 +92,16 @@ func Run(cfg config.Config) {
 	server := grpc.NewServer()
 
 	e := echo.New()
+
+	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+		// Be careful to use constant time comparison to prevent timing attacks
+		if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
+			subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1 {
+			return true, nil
+		}
+		return false, nil
+	}))
+
 	e.Use(middleware.Logger())
 	e.Use(oapimiddleware.OapiRequestValidator(swagger))
 
