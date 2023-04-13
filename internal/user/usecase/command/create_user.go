@@ -23,31 +23,6 @@ func (h *CreateUserHandler) Handle(
 		return domain.PassNonComporableErr{}
 	}
 
-	if err := h.validator.Email.IsValid(userDelivery.Email); err != nil {
-		return err
-	}
-	if err := h.validator.Login.IsValid(userDelivery.Login); err != nil {
-		return err
-	}
-	if err := h.validator.PhoneNumber.IsValid(userDelivery.PhoneNumber); err != nil {
-		return err
-	}
-	if err := h.validator.FirstName.IsValid(userDelivery.FirstName); err != nil {
-		return err
-	}
-	if err := h.validator.SecondName.IsValid(userDelivery.SecondName); err != nil {
-		return err
-	}
-	if err := h.validator.Patronimic.IsValid(userDelivery.Patronimic); err != nil {
-		return err
-	}
-	if err := h.validator.Password.IsValid(userDelivery.Password); err != nil {
-		return err
-	}
-	if err := h.validator.Avatar.IsValid(userDelivery.PathToAvatar); err != nil {
-		return err
-	}
-
 	user := domain.User{
 		Id: uuid.New(),
 
