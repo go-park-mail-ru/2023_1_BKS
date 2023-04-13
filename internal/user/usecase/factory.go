@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewApplication(ctx context.Context, cfg config.Config) (Commands, Queries) {
+func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%d sslmode=%s",
 		cfg.Db.User, cfg.Db.DataBaseName, cfg.Db.Password, cfg.Db.Host,
 		cfg.Db.Port, cfg.Db.Sslmode)
@@ -26,6 +26,7 @@ func NewApplication(ctx context.Context, cfg config.Config) (Commands, Queries) 
 			DeleteUser: command.NewDeleteUserHandler(&Repository, validator, logger),
 		},
 		Queries{
-			GetUser: query.NewGetIdUserHandler(Repository, logger),
+			GetUser:   query.NewGetIdUserHandler(Repository, logger),
+			CheckUser: query.NewCheckUserHandler(Repository, logger),
 		}
 }

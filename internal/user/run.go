@@ -4,15 +4,71 @@ import (
 	"config"
 	"context"
 	"fmt"
+	"net"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	oapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 
+	"google.golang.org/grpc"
+
+	oapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
+
+	serverGrpc "user/delivery/grpc"
 	v2 "user/delivery/http/v2"
 	"user/usecase"
 )
+
+func AsyncRunHTTP(e *echo.Echo, cfg config.Config) error {
+	go func() {
+		err := e.Start(fmt.Sprintf("0.0.0.0:%d", cfg.Http.Port))
+		if err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+	<-interrupt
+
+	timeout := time.Duration(10)
+	if timeout == 0 {
+		timeout = 10 * time.Second
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return e.Shutdown(ctx)
+}
+
+func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) error {
+	go func() {
+		err := server.Serve(lis)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+			os.Exit(1)
+		}
+	}()
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+	<-interrupt
+
+	timeout := time.Duration(10)
+	if timeout == 0 {
+		timeout = 10 * time.Second
+	}
+
+	server.GracefulStop()
+
+	return nil
+}
 
 func Run(cfg config.Config) {
 
@@ -24,12 +80,39 @@ func Run(cfg config.Config) {
 	}
 	swagger.Servers = nil
 
-	command, query := usecase.NewApplication(ctx, cfg)
+	command, query := usecase.NewUsecase(ctx, cfg)
 
 	serverHandler := v2.CreateHttpServer(command, query)
+
+	grpcHandler := serverGrpc.CreateGrpcServer(command, query)
+
+	server := grpc.NewServer()
+
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(oapimiddleware.OapiRequestValidator(swagger))
+
 	v2.RegisterHandlers(e, &serverHandler)
-	e.Logger.Fatal(e.Start(fmt.Sprintf("0.0.0.0:%d", cfg.Http.Port)))
+
+	errs := make(chan error, 1)
+	go func() {
+		errs <- AsyncRunHTTP(e, cfg)
+	}()
+	errc := <-errs
+
+	lis, err := net.Listen("tcp", ":8081")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+		os.Exit(1)
+	}
+
+	serverGrpc.RegisterUserServer(server, &grpcHandler)
+
+	errg := make(chan error, 1)
+	go func() {
+		errg <- AsyncRunGrpc(server, lis, cfg)
+	}()
+	errt := <-errg
+
+	log.Warn("Terminating aplication:", errc, errt)
 }

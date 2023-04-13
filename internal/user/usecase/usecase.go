@@ -14,5 +14,6 @@ type Commands struct {
 
 //В данном агрегате перечисленны все запросы сервиса пользователя
 type Queries struct {
-	GetUser query.GetIdUserHandler
+	GetUser   query.GetIdUserHandler
+	CheckUser query.CheckUserHandler
 }

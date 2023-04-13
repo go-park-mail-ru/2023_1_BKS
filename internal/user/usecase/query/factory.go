@@ -12,3 +12,10 @@ func NewGetIdUserHandler(
 ) GetIdUserHandler {
 	return GetIdUserHandler{userRepo: userRepo, loger: loger}
 }
+
+func NewCheckUserHandler(
+	userRepo domain.RRepository,
+	loger *logrus.Entry,
+) CheckUserHandler {
+	return CheckUserHandler{userRepo: userRepo, loger: loger}
+}

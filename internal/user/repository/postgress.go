@@ -69,6 +69,15 @@ func (t UserPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domai
 	}, err
 }
 
+func (t UserPostgressRepository) CheckUser(ctx context.Context, login string, password string) bool {
+	var checkUser bool
+
+	row := t.users.QueryRow("SELECT EXISTS (SELECT * FROM users WHERE login = $1 and password = $2)", login, password)
+	row.Scan(&checkUser)
+
+	return checkUser
+}
+
 func (t *UserPostgressRepository) Create(ctx context.Context, user domain.User) error {
 	_, err := t.users.Exec("insert into users (id, email,  phonenumber, login, password, firstname, secondname, patronimic, pathtoavatar) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 		user.Id, user.Email, user.PhoneNumber, user.Login, user.Password, user.FirstName,
