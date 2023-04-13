@@ -86,7 +86,7 @@ func (t *UserPostgressRepository) Update(ctx context.Context, user domain.User) 
 }
 
 func (t *UserPostgressRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	_, err := t.users.Exec("update users set email = $1,  phonenumber = $2, login = $3, password = $4, firstname = $5, secondname = $6, patronimic = $7, avatar = $8 where id = $9", id)
+	_, err := t.users.Exec("delete from users where id = $1", id)
 	//logout
 	return err
 }
