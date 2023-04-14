@@ -7,7 +7,6 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/ecdsafile"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/lestrrat-go/jwx/jws"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
@@ -58,39 +57,4 @@ func NewInstanceAuthenticator() (*InstanceAuthenticator, error) {
 func (f *InstanceAuthenticator) ValidateJWS(jwsString string, audience string, issuer string) (jwt.Token, error) {
 	return jwt.Parse([]byte(jwsString), jwt.WithKeySet(f.KeySet),
 		jwt.WithAudience(audience), jwt.WithIssuer(issuer))
-}
-
-func (f *InstanceAuthenticator) SignToken(t jwt.Token) ([]byte, error) {
-	hdr := jws.NewHeaders()
-	if err := hdr.Set(jws.AlgorithmKey, jwa.ES256); err != nil {
-		return nil, fmt.Errorf("setting algorithm: %w", err)
-	}
-	if err := hdr.Set(jws.TypeKey, "JWT"); err != nil {
-		return nil, fmt.Errorf("setting type: %w", err)
-	}
-	if err := hdr.Set(jws.KeyIDKey, KeyID); err != nil {
-		return nil, fmt.Errorf("setting Key ID: %w", err)
-	}
-	return jwt.Sign(t, jwa.ES256, f.PrivateKey, jwt.WithHeaders(hdr))
-}
-
-func (f *InstanceAuthenticator) CreateJWSWithClaims(claims []string, audience string, issuer string) ([]byte, error) {
-	t := jwt.New()
-
-	err := t.Set(jwt.AudienceKey, audience)
-	if err != nil {
-		return nil, fmt.Errorf("setting audience: %w", err)
-	}
-
-	err = t.Set(jwt.IssuerKey, issuer)
-	if err != nil {
-		return nil, fmt.Errorf("setting issuer: %w", err)
-	}
-
-	err = t.Set(PermissionsClaim, claims)
-	if err != nil {
-		return nil, fmt.Errorf("setting permissions: %w", err)
-	}
-
-	return f.SignToken(t)
 }
