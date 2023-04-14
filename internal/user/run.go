@@ -1,7 +1,7 @@
 package user
 
 import (
-	"config"
+	config "config/user"
 	"context"
 	"fmt"
 	"net"
@@ -11,8 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -68,18 +66,6 @@ func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) erro
 	return nil
 }
 
-func CreateMiddleware(v JWSValidator, swagger *openapi3.T) ([]echo.MiddlewareFunc, error) {
-
-	validator := oapimiddleware.OapiRequestValidatorWithOptions(swagger,
-		&oapimiddleware.Options{
-			Options: openapi3filter.Options{
-				AuthenticationFunc: NewAuthenticator(v),
-			},
-		})
-
-	return []echo.MiddlewareFunc{validator}, nil
-}
-
 func Run(cfg config.Config) {
 
 	ctx := context.Background()
@@ -107,13 +93,13 @@ func Run(cfg config.Config) {
 
 	e := echo.New()
 
-	fa, err := NewAuthenticator()
+	fa, err := authmiddlevare.NewInstanceAuthenticator()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
 		os.Exit(1)
 	}
 
-	mw, err := authmiddlevare.CreateMiddleware(fa, swagger)
+	mw, err := authmiddlevare.CreateMiddleware(fa, swagger, "AppUniqFrontend", "AppUniqUser")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
 		os.Exit(1)
