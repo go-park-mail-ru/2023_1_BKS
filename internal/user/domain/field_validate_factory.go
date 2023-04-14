@@ -1,6 +1,6 @@
 package domain
 
-import "config"
+import config "config/user"
 
 func CreateSpecificationManager(cfg config.Config) SpecificationManager {
 	return SpecificationManager{

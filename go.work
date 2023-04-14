@@ -2,4 +2,6 @@ go 1.18
 
 use ./internal/user
 
-use ./config/user
+use ./config/
+
+use ./pkg/

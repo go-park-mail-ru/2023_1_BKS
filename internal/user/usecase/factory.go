@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"config"
+	config "config/user"
 	"context"
 	"fmt"
 	"user/domain"

@@ -3,7 +3,6 @@ package user
 import (
 	"config"
 	"context"
-	"crypto/subtle"
 	"fmt"
 	"net"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -20,6 +21,7 @@ import (
 
 	oapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 
+	authmiddlevare "pkg/middleware"
 	serverGrpc "user/delivery/grpc"
 	v2 "user/delivery/http/v2"
 	"user/usecase"
@@ -66,6 +68,18 @@ func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) erro
 	return nil
 }
 
+func CreateMiddleware(v JWSValidator, swagger *openapi3.T) ([]echo.MiddlewareFunc, error) {
+
+	validator := oapimiddleware.OapiRequestValidatorWithOptions(swagger,
+		&oapimiddleware.Options{
+			Options: openapi3filter.Options{
+				AuthenticationFunc: NewAuthenticator(v),
+			},
+		})
+
+	return []echo.MiddlewareFunc{validator}, nil
+}
+
 func Run(cfg config.Config) {
 
 	ctx := context.Background()
@@ -93,14 +107,19 @@ func Run(cfg config.Config) {
 
 	e := echo.New()
 
-	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
-		// Be careful to use constant time comparison to prevent timing attacks
-		if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
-			subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1 {
-			return true, nil
-		}
-		return false, nil
-	}))
+	fa, err := NewAuthenticator()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+		os.Exit(1)
+	}
+
+	mw, err := authmiddlevare.CreateMiddleware(fa, swagger)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+		os.Exit(1)
+	}
+	e.Use(middleware.Logger())
+	e.Use(mw...)
 
 	e.Use(middleware.Logger())
 	e.Use(oapimiddleware.OapiRequestValidator(swagger))

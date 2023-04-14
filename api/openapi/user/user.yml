@@ -9,7 +9,7 @@ servers:
       hostname:
         default: localhost
 paths:
-  /user:
+  /api/user:
     get:
       summary: Вернуть данные пользователя.
       operationId: getUser
@@ -88,7 +88,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
-  /user/{id}:
+  /api/user/{id}:
     get:
       summary: Вернуть пользователя по id.
       operationId: findUserByID
@@ -199,13 +199,7 @@ components:
           description: Error message
           
     JsonWebToken:
-      description: |
-        JWT is built in the following format:
-          f"base64urlEncoding(header) + '.' + base64urlEncoding(payload) + '.' + base64urlEncoding(signature)"
-        header is an object containing -> {"alg": {CHOSEN_ALG}, "typ": "JWT"}
-        payload is an object containing the claims (data of jwt)
-        signature is an encoded with a PRIVATE_KEY object by our CHOSEN_ALG from the following format: 
-          CHOSEN_ALG( PRIVATE_KEY, base64urlEncoding(header) + '.' + base64urlEncoding(payload))
+      description: JWT иокен
       type: string
       format: application/jwt
       pattern: ^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]+)$

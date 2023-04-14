@@ -56,7 +56,8 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	return nil
+
+	return ctx.JSON(http.StatusCreated, 23424)
 }
 
 func (a *HttpServer) UpdateUser(ctx echo.Context) error {
