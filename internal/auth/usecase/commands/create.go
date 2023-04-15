@@ -26,7 +26,10 @@ type CreateJWSHandle struct {
 
 func (f *CreateJWSHandle) CreateJWSWithClaims(claims []string, audience string, issuer string) ([]byte, error) {
 	t := jwt.New()
-
+	err := t.Set(PermissionsClaim, claims)
+	if err != nil {
+		return nil, fmt.Errorf("setting permissions: %w", err)
+	}
 	return f.SignToken(t)
 }
 

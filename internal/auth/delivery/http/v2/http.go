@@ -2,10 +2,13 @@ package v2
 
 import (
 	app "auth/usecase"
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"google.golang.org/grpc"
 )
 
 //go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../../api/openapi/auth/models.cfg.yml ../../../../../api/openapi/auth/auth.yml
@@ -26,6 +29,7 @@ type HttpServer struct {
 }
 
 func (d *HttpServer) Login(ctx echo.Context) error {
+
 	var data SignUp
 
 	err := ctx.Bind(&data)
@@ -33,7 +37,22 @@ func (d *HttpServer) Login(ctx echo.Context) error {
 		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
 	}
 
-	//massive := append([]string{}, "dw")
+	grcpConn, err := grpc.Dial(
+		"127.0.0.1:8081",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatalf("cant connect to grpc")
+	}
+	defer grcpConn.Close()
+
+	sessManager := NewUserClient(grcpConn)
+
+	cr := UserCheck{Login: "dww", Password: "5445"}
+
+	wd, err := sessManager.CheckAccount(context.Background(), &cr)
+	fmt.Println(wd.GetValue())
+
 	result, err := d.command.CreateToken.CreateJWSWithClaims([]string{}, "appUniqFront", "auth")
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))

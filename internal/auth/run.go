@@ -61,7 +61,6 @@ func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) erro
 }
 */
 func Run() {
-
 	ctx := context.Background()
 
 	swagger, err := v2.GetSwagger()
@@ -106,5 +105,5 @@ func Run() {
 
 	//serverGrpc.RegisterUserServer(server, &grpcHandler)
 
-	e.Start(fmt.Sprintf("0.0.0.0:%d", 8082))
+	e.Logger.Fatal(e.Start(fmt.Sprintf("0.0.0.0:%d", 8082)))
 }
