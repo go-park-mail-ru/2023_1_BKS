@@ -26,6 +26,6 @@ func main() {
 	cr := client.UserCheck{Login: "dww", Password: "5445"}
 
 	wd, err := sessManager.CheckAccount(context.Background(), &cr)
-	fmt.Println(wd.Value)
+	fmt.Println(wd.GetValue())
 
 }

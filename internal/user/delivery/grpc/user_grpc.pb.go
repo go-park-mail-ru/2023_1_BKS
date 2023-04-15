@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserClient interface {
-	CheckAccount(ctx context.Context, in *UserCheck, opts ...grpc.CallOption) (*BoolValue, error)
+	CheckAccount(ctx context.Context, in *UserCheck, opts ...grpc.CallOption) (*Uuid, error)
 }
 
 type userClient struct {
@@ -37,8 +37,8 @@ func NewUserClient(cc grpc.ClientConnInterface) UserClient {
 	return &userClient{cc}
 }
 
-func (c *userClient) CheckAccount(ctx context.Context, in *UserCheck, opts ...grpc.CallOption) (*BoolValue, error) {
-	out := new(BoolValue)
+func (c *userClient) CheckAccount(ctx context.Context, in *UserCheck, opts ...grpc.CallOption) (*Uuid, error) {
+	out := new(Uuid)
 	err := c.cc.Invoke(ctx, User_CheckAccount_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (c *userClient) CheckAccount(ctx context.Context, in *UserCheck, opts ...gr
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
 type UserServer interface {
-	CheckAccount(context.Context, *UserCheck) (*BoolValue, error)
+	CheckAccount(context.Context, *UserCheck) (*Uuid, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -58,7 +58,7 @@ type UserServer interface {
 type UnimplementedUserServer struct {
 }
 
-func (UnimplementedUserServer) CheckAccount(context.Context, *UserCheck) (*BoolValue, error) {
+func (UnimplementedUserServer) CheckAccount(context.Context, *UserCheck) (*Uuid, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAccount not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}

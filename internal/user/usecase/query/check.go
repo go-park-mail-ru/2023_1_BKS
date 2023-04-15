@@ -16,6 +16,6 @@ func (h CheckUserHandler) Handle(
 	ctx context.Context,
 	login string,
 	password string,
-) bool {
+) string {
 	return h.userRepo.CheckUser(ctx, login, password)
 }

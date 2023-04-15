@@ -12,11 +12,11 @@ message UserCheck {
   string Password = 2;
 }
 
-message BoolValue {
-  bool Value = 1;
+message Uuid {
+  string Value = 1;
 }
 
 // grpc-сервис пользователя
 service User {
-    rpc CheckAccount (UserCheck) returns (BoolValue) {}
+    rpc CheckAccount (UserCheck) returns (Uuid) {}
 }

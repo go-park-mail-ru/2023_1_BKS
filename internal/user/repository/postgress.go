@@ -69,10 +69,10 @@ func (t UserPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domai
 	}, err
 }
 
-func (t UserPostgressRepository) CheckUser(ctx context.Context, login string, password string) bool {
-	var checkUser bool
+func (t UserPostgressRepository) CheckUser(ctx context.Context, login string, password string) string {
+	var checkUser string
 
-	row := t.users.QueryRow("SELECT EXISTS (SELECT * FROM users WHERE login = $1 and password = $2)", login, password)
+	row := t.users.QueryRow("SELECT id FROM users WHERE login = $1 and password = $2", login, password)
 	row.Scan(&checkUser)
 
 	return checkUser

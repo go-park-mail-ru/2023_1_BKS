@@ -12,7 +12,7 @@ type GrpcServer struct {
 	query   app.Queries
 }
 
-func (g *GrpcServer) CheckAccount(ctx context.Context, in *UserCheck) (*BoolValue, error) {
-	result := BoolValue{Value: g.query.CheckUser.Handle(ctx, in.Login, in.Password)}
+func (g *GrpcServer) CheckAccount(ctx context.Context, in *UserCheck) (*Uuid, error) {
+	result := Uuid{Value: g.query.CheckUser.Handle(ctx, in.Login, in.Password)}
 	return &result, nil
 }

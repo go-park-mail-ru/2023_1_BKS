@@ -14,5 +14,5 @@ type CUDRepository interface {
 
 type RRepository interface {
 	GetId(ctx context.Context, id uuid.UUID) (User, error)
-	CheckUser(ctx context.Context, login string, password string) bool
+	CheckUser(ctx context.Context, login string, password string) string
 }
