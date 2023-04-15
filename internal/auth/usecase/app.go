@@ -1,13 +1,10 @@
-package app
+package usecase
 
-//Корневой агрегат для доступа к бизнес-логике сервиса авторизации
-type Application struct {
-	Commands Commands
-	Queries  Queries
-}
+import "auth/usecase/commands"
 
 //В данном агрегате перечисленны все команды сервиса авторизации
 type Commands struct {
+	CreateToken commands.CreateJWSHandle
 }
 
 //В данном агрегате перечисленны все запросы сервиса авторизации
