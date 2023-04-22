@@ -4,9 +4,9 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: "user"
-      POSTGRES_USER: "appimage"
+      POSTGRES_USER: "appuniq"
       POSTGRES_PASSWORD: "uniq123"
     volumes:
-      - .:/docker-entrypoint-initdb.d
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5433:5433"
+      - "5432:5432"

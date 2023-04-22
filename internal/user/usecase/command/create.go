@@ -32,9 +32,7 @@ func (h *CreateUserHandler) Handle(
 		Login:    userDelivery.Login,
 		Password: userDelivery.Password,
 
-		SecondName: userDelivery.SecondName,
-		FirstName:  userDelivery.FirstName,
-		Patronimic: userDelivery.Patronimic,
+		Name: userDelivery.Name,
 
 		PathToAvatar: userDelivery.PathToAvatar,
 	}

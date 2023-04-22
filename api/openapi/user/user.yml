@@ -122,9 +122,7 @@ components:
             - Email
             - Login
             - PhoneNumber
-            - SecondName
-            - Patronimic
-            - FirstName
+            - Name
             - Password
             - PasswordCheck
             - Avatar
@@ -137,16 +135,10 @@ components:
               description: Логин пользователя.
             PhoneNumber:
               type: string
-              description: Логин пользователя.
-            SecondName:
-              type: string
-              description: Фамилия пользователя.
-            FirstName:
+              description: Номер телефона пользователя.
+            Name:
               type: string
               description: Имя пользователя.
-            Patronimic:
-              type: string
-              description: Отчество пользователя.
             Password:
               type: string
               description: Пароль пользователя.
@@ -161,9 +153,7 @@ components:
         - required:
             - ID
             - PhoneNumber
-            - SecondName
-            - FirstName
-            - Patronimic
+            - Name
             - Avatar
           properties:
             ID:
@@ -171,16 +161,10 @@ components:
               description: Логин пользователя.
             PhoneNumber:
               type: string
-              description: Логин пользователя.
-            SecondName:
-              type: string
-              description: Фамилия пользователя.
-            FirstName:
+              description: Номер телефона пользователя.
+            Name:
               type: string
               description: Имя пользователя.
-            Patronimic:
-              type: string
-              description: Отчество пользователя.
             Avatar:
               type: string
               description: Аватар пользователя.

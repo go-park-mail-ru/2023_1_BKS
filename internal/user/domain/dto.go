@@ -14,9 +14,7 @@ type User struct {
 	Password      string
 	CheckPassword string
 
-	SecondName string
-	FirstName  string
-	Patronimic string
+	Name string
 
 	PathToAvatar string
 }

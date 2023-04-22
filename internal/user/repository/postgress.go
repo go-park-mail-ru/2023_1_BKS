@@ -18,14 +18,12 @@ func (t UserPostgressRepository) AuthGetId(ctx context.Context, id uuid.UUID) (d
 		phoneNumber  string
 		login        string
 		password     string
-		secondName   string
-		firstName    string
-		patronimic   string
+		name         string
 		pathToAvatar string
 	)
 
-	row := t.users.QueryRow("SELECT email, phonenumber, login, password, secondname, firstname, patronimic, pathtoavatar FROM users WHERE id = $1 LIMIT 1", id)
-	err := row.Scan(&email, &phoneNumber, &login, &password, &secondName, &firstName, &patronimic, &pathToAvatar)
+	row := t.users.QueryRow("SELECT email, phonenumber, login, password, name, pathtoavatar FROM users WHERE id = $1 LIMIT 1", id)
+	err := row.Scan(&email, &phoneNumber, &login, &password, &name, &pathToAvatar)
 
 	return domain.User{
 		Email:       email,
@@ -34,9 +32,7 @@ func (t UserPostgressRepository) AuthGetId(ctx context.Context, id uuid.UUID) (d
 		Login:    login,
 		Password: password,
 
-		SecondName: secondName,
-		FirstName:  firstName,
-		Patronimic: patronimic,
+		Name: name,
 
 		PathToAvatar: pathToAvatar,
 	}, err
@@ -44,26 +40,18 @@ func (t UserPostgressRepository) AuthGetId(ctx context.Context, id uuid.UUID) (d
 
 func (t UserPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domain.User, error) {
 	var (
-		email       string
-		phoneNumber string
-
-		secondName string
-		firstName  string
-		patronimic string
-
+		phoneNumber  string
+		name         string
 		pathToAvatar string
 	)
 
-	row := t.users.QueryRow("SELECT email, phonenumber, secondname, firstname, patronimic, pathtoavatar FROM users WHERE id = $1 LIMIT 1", id)
-	err := row.Scan(&email, &phoneNumber, &secondName, &firstName, &patronimic, &pathToAvatar)
+	row := t.users.QueryRow("SELECT  phonenumber, name, pathtoavatar FROM users WHERE id = $1 LIMIT 1", id)
+	err := row.Scan(&phoneNumber, &name, &pathToAvatar)
 
 	return domain.User{
-		Email:       email,
 		PhoneNumber: phoneNumber,
 
-		SecondName: secondName,
-		FirstName:  firstName,
-		Patronimic: patronimic,
+		Name: name,
 
 		PathToAvatar: pathToAvatar,
 	}, err
@@ -79,18 +67,18 @@ func (t UserPostgressRepository) CheckUser(ctx context.Context, login string, pa
 }
 
 func (t *UserPostgressRepository) Create(ctx context.Context, user domain.User) error {
-	_, err := t.users.Exec("insert into users (id, email,  phonenumber, login, password, firstname, secondname, patronimic, pathtoavatar) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-		user.Id, user.Email, user.PhoneNumber, user.Login, user.Password, user.FirstName,
-		user.SecondName, user.Patronimic, user.PathToAvatar)
+	_, err := t.users.Exec("insert into users (id, email,  phonenumber, login, password, name, pathtoavatar) values ($1, $2, $3, $4, $5, $6, $7)",
+		user.Id, user.Email, user.PhoneNumber, user.Login, user.Password, user.Name,
+		user.PathToAvatar)
 	// Должен возвращаться или ссесия или jwt токен
 	return err
 }
 
 func (t *UserPostgressRepository) Update(ctx context.Context, user domain.User) error {
 	id, _ := uuid.Parse("978137d3-a263-4dc7-9308-43e35c0c83ff") // Тут должго быть получение значений из авторизированного пользователя
-	_, err := t.users.Exec("update users set email = $1,  phonenumber = $2, login = $3, password = $4, firstname = $5, secondname = $6, patronimic = $7, pathtoavatar = $8 where id = $9",
-		user.Email, user.PhoneNumber, user.Login, user.Password, user.FirstName,
-		user.SecondName, user.Patronimic, user.PathToAvatar, id)
+	_, err := t.users.Exec("update users set email = $1,  phonenumber = $2, login = $3, password = $4, name = $5, pathtoavatar = $6 where id = $7",
+		user.Email, user.PhoneNumber, user.Login, user.Password, user.Name,
+		user.PathToAvatar, id)
 	return err
 }
 

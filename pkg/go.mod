@@ -3,7 +3,7 @@ module pkg
 go 1.18
 
 require (
-	github.com/getkin/kin-openapi v0.115.0
+	github.com/getkin/kin-openapi v0.107.0
 	github.com/lestrrat-go/jwx v1.2.25
 )
 

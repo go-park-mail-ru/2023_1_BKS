@@ -45,9 +45,7 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 		Login:    newUser.Login,
 		Password: newUser.Password,
 
-		SecondName: newUser.SecondName,
-		FirstName:  newUser.FirstName,
-		Patronimic: newUser.Patronimic,
+		Name: newUser.Name,
 
 		PathToAvatar: newUser.Avatar,
 	}
@@ -77,9 +75,7 @@ func (a *HttpServer) UpdateUser(ctx echo.Context) error {
 		Login:    updateUser.Login,
 		Password: updateUser.Password,
 
-		SecondName: updateUser.SecondName,
-		FirstName:  updateUser.FirstName,
-		Patronimic: updateUser.Patronimic,
+		Name: updateUser.Name,
 
 		PathToAvatar: updateUser.Avatar,
 	}
@@ -106,11 +102,8 @@ func (a HttpServer) GetUser(ctx echo.Context) error {
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	result := GetUser{
-		ID:          user.Id.String(),
-		SecondName:  user.SecondName,
-		FirstName:   user.FirstName,
-		Patronimic:  user.Patronimic,
+	result := CreateUser{
+		Name:        user.Name,
 		PhoneNumber: user.PhoneNumber,
 		Avatar:      user.PathToAvatar,
 	}
@@ -128,10 +121,7 @@ func (a *HttpServer) FindUserByID(ctx echo.Context, id string) error {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 	result := GetUser{
-		ID:          user.Id.String(),
-		SecondName:  user.SecondName,
-		FirstName:   user.FirstName,
-		Patronimic:  user.Patronimic,
+		Name:        user.Name,
 		PhoneNumber: user.PhoneNumber,
 		Avatar:      user.PathToAvatar,
 	}

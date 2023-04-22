@@ -15,11 +15,11 @@ type CreateUser struct {
 	// Email Email пользователя.
 	Email string `json:"Email"`
 
-	// FirstName Имя пользователя.
-	FirstName string `json:"FirstName"`
-
 	// Login Логин пользователя.
 	Login string `json:"Login"`
+
+	// Name Имя пользователя.
+	Name string `json:"Name"`
 
 	// Password Пароль пользователя.
 	Password string `json:"Password"`
@@ -27,14 +27,8 @@ type CreateUser struct {
 	// PasswordCheck Проверка пароля пользователя.
 	PasswordCheck string `json:"PasswordCheck"`
 
-	// Patronimic Отчество пользователя.
-	Patronimic string `json:"Patronimic"`
-
-	// PhoneNumber Логин пользователя.
+	// PhoneNumber Номер телефона пользователя.
 	PhoneNumber string `json:"PhoneNumber"`
-
-	// SecondName Фамилия пользователя.
-	SecondName string `json:"SecondName"`
 }
 
 // ErrorHTTP defines model for ErrorHTTP.
@@ -51,28 +45,17 @@ type GetUser struct {
 	// Avatar Аватар пользователя.
 	Avatar string `json:"Avatar"`
 
-	// FirstName Имя пользователя.
-	FirstName string `json:"FirstName"`
-
 	// ID Логин пользователя.
 	ID string `json:"ID"`
 
-	// Patronimic Отчество пользователя.
-	Patronimic string `json:"Patronimic"`
+	// Name Имя пользователя.
+	Name string `json:"Name"`
 
-	// PhoneNumber Логин пользователя.
+	// PhoneNumber Номер телефона пользователя.
 	PhoneNumber string `json:"PhoneNumber"`
-
-	// SecondName Фамилия пользователя.
-	SecondName string `json:"SecondName"`
 }
 
-// JsonWebToken JWT is built in the following format:
-//   f"base64urlEncoding(header) + '.' + base64urlEncoding(payload) + '.' + base64urlEncoding(signature)"
-// header is an object containing -> {"alg": {CHOSEN_ALG}, "typ": "JWT"}
-// payload is an object containing the claims (data of jwt)
-// signature is an encoded with a PRIVATE_KEY object by our CHOSEN_ALG from the following format:
-//   CHOSEN_ALG( PRIVATE_KEY, base64urlEncoding(header) + '.' + base64urlEncoding(payload))
+// JsonWebToken JWT иокен
 type JsonWebToken = string
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
