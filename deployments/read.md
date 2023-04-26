@@ -20,6 +20,6 @@ docker compose up
 
 docker compose down
 
-docker compose build
+docker compose build (--no-cache флаг для полной пересборки например при обновлении git)
 
 docker compose up
