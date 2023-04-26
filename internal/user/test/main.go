@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	servGrpc "pkg/grpc/user"
+
 	"google.golang.org/grpc"
 )
 
@@ -19,9 +21,9 @@ func main() {
 	}
 	defer grcpConn.Close()
 
-	sessManager := NewUserClient(grcpConn)
+	sessManager := servGrpc.NewUserClient(grcpConn)
 
-	cr := UserCheck{Login: "dw3234dw", Password: "5445"}
+	cr := servGrpc.UserCheck{Login: "dw3234dw", Password: "5445"}
 
 	wd, err := sessManager.CheckAccount(context.Background(), &cr)
 	fmt.Println(wd.GetValue())

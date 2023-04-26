@@ -1,5 +1,15 @@
 version: "3.9"
 services:
+
+  user-service:
+    image: user
+    container_name: "user"
+    command: ./app
+    ports:
+      - 10000:8000
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres
     environment:
