@@ -4,7 +4,7 @@
 // - protoc             v3.12.4
 // source: user.proto
 
-package v2
+package grpc
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_CheckAccount_FullMethodName = "/v2.User/CheckAccount"
+	User_CheckAccount_FullMethodName = "/delivery.User/CheckAccount"
 )
 
 // UserClient is the client API for User service.
@@ -96,7 +96,7 @@ func _User_CheckAccount_Handler(srv interface{}, ctx context.Context, dec func(i
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var User_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "v2.User",
+	ServiceName: "delivery.User",
 	HandlerType: (*UserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

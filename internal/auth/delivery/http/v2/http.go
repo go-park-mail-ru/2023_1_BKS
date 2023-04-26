@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	servGrpc "pkg/grpc/user"
+
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc"
 )
@@ -46,17 +48,20 @@ func (d *HttpServer) Login(ctx echo.Context) error {
 	}
 	defer grcpConn.Close()
 
-	sessManager := NewUserClient(grcpConn)
+	sessManager := servGrpc.NewUserClient(grcpConn)
 
-	cr := UserCheck{Login: "dww", Password: "5445"}
+	cr := servGrpc.UserCheck{Login: data.Login, Password: data.Password}
 
 	wd, err := sessManager.CheckAccount(context.Background(), &cr)
-	fmt.Println(wd.GetValue())
+
+	if wd.GetValue() == "" {
+		return sendUserError(ctx, http.StatusBadRequest, "Ошибка логина или паролся")
+	}
 
 	result, err := d.command.CreateToken.CreateJWSWithClaims([]string{}, "appUniqFront", "auth")
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	return ctx.JSON(http.StatusOK, string(result))
+	return ctx.JSON(http.StatusOK, result)
 }
