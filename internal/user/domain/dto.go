@@ -9,6 +9,7 @@ type User struct {
 
 	Email       string
 	PhoneNumber string
+	Address     string
 
 	Login         string
 	Password      string

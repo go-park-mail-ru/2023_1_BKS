@@ -6,11 +6,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewGetIdUserHandler(
+func NewGetUserHandler(
 	userRepo domain.RRepository,
 	loger *logrus.Entry,
-) GetIdUserHandler {
-	return GetIdUserHandler{userRepo: userRepo, loger: loger}
+) GetUserHandler {
+	return GetUserHandler{userRepo: userRepo, loger: loger}
+}
+
+func NewFindByIdUserHandler(
+	userRepo domain.RRepository,
+	loger *logrus.Entry,
+) FindByIdUserHandler {
+	return FindByIdUserHandler{userRepo: userRepo, loger: loger}
 }
 
 func NewCheckUserHandler(

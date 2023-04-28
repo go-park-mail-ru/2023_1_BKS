@@ -26,7 +26,8 @@ func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 			DeleteUser: command.NewDeleteUserHandler(&Repository, validator, logger),
 		},
 		Queries{
-			GetUser:   query.NewGetIdUserHandler(Repository, logger),
-			CheckUser: query.NewCheckUserHandler(Repository, logger),
+			GetUser:      query.NewGetUserHandler(Repository, logger),
+			CheckUser:    query.NewCheckUserHandler(Repository, logger),
+			FindByIdUser: query.NewFindByIdUserHandler(Repository, logger),
 		}
 }

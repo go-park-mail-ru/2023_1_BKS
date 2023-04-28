@@ -3,12 +3,16 @@ package v2
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
+	servGrpc "pkg/grpc/auth"
+	"pkg/jwt"
 	"user/domain"
 	app "user/usecase"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/grpc"
 )
 
 //go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../../api/openapi/user/models.cfg.yml ../../../../../api/openapi/user/user.yml
@@ -28,6 +32,7 @@ type HttpServer struct {
 	query   app.Queries
 }
 
+// Handler отвечает за создание пользователя
 func (a *HttpServer) CreateUser(ctx echo.Context) error {
 	var newUser CreateUser
 
@@ -50,14 +55,36 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 		PathToAvatar: newUser.Avatar,
 	}
 
+	grcpConn, err := grpc.Dial(
+		"127.0.0.1:8085",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatalf("cant connect to grpc")
+	}
+	defer grcpConn.Close()
+
+	sessManager := servGrpc.NewAuthClient(grcpConn)
+
+	cr := servGrpc.Id{Id: user.Id.String()}
+
+	fmt.Println(cr.GetId())
+
+	wd, err := sessManager.GenerateAccessToken(context.Background(), &cr)
+
+	if wd.GetValue() == "" {
+		return sendUserError(ctx, http.StatusBadRequest, "Ошибка генерации токена")
+	}
+
 	err = a.command.CreateUser.Handle(context.Background(), newUser.PasswordCheck, user)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	return ctx.JSON(http.StatusCreated, 23424)
+	return ctx.JSON(http.StatusCreated, wd.GetValue())
 }
 
+// Handler отвечает за обновление данных пользователя
 func (a *HttpServer) UpdateUser(ctx echo.Context) error {
 	var updateUser CreateUser
 
@@ -66,8 +93,16 @@ func (a *HttpServer) UpdateUser(ctx echo.Context) error {
 		return sendUserError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
 	}
 
+	headerAuth := ctx.Request().Header.Get("Authorization")
+	id := jwt.ClaimParse(headerAuth, "id")
+
+	uuids, err := uuid.Parse(id)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
 	user := domain.User{
-		Id: uuid.New(), // Значения uuid из авторизации
+		Id: uuids,
 
 		Email:       updateUser.Email,
 		PhoneNumber: updateUser.PhoneNumber,
@@ -88,35 +123,58 @@ func (a *HttpServer) UpdateUser(ctx echo.Context) error {
 	return nil
 }
 
+// Handler отвечает за удаление пользователя
 func (a *HttpServer) DeleteUser(ctx echo.Context) error {
-	err := a.command.DeleteUser.Handle(context.Background(), uuid.New()) // Значения из авторизации
+	headerAuth := ctx.Request().Header.Get("Authorization")
+	id := jwt.ClaimParse(headerAuth, "id")
+
+	uuids, err := uuid.Parse(id)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+	err = a.command.DeleteUser.Handle(context.Background(), uuids) // Значения из авторизации
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 	return nil
 }
 
+// Handler отвечает за возврат данных авторизованного пользователя
 func (a HttpServer) GetUser(ctx echo.Context) error {
 	var user domain.User
-	user, err := a.query.GetUser.Handle(context.Background(), uuid.New()) // Тут должен быть uuid из авторизации
+	headerAuth := ctx.Request().Header.Get("Authorization")
+	id := jwt.ClaimParse(headerAuth, "id")
+
+	uuids, err := uuid.Parse(id)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
+
+	user, err = a.query.GetUser.Handle(context.Background(), uuids)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+	fmt.Println(23)
 	result := CreateUser{
-		Name:        user.Name,
-		PhoneNumber: user.PhoneNumber,
-		Avatar:      user.PathToAvatar,
+		Name:          user.Name,
+		Email:         user.Email,
+		Login:         user.Login,
+		Password:      user.Password,
+		PasswordCheck: user.CheckPassword,
+		PhoneNumber:   user.PhoneNumber,
+		Avatar:        user.PathToAvatar,
 	}
 	return ctx.JSON(http.StatusOK, result)
 }
 
+// Handler отвечает за возврат данных неавторизованных пользователей
 func (a *HttpServer) FindUserByID(ctx echo.Context, id string) error {
 	var user domain.User
-	uuid, err := uuid.Parse(id)
+	uuids, err := uuid.Parse(id)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	user, err = a.query.GetUser.Handle(context.Background(), uuid)
+	user, err = a.query.FindByIdUser.Handle(context.Background(), uuids)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}

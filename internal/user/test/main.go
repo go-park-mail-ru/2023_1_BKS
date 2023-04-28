@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	servGrpc "pkg/grpc/user"
+	servGrpc "pkg/grpc/auth"
 
 	"google.golang.org/grpc"
 )
@@ -13,7 +13,7 @@ import (
 func main() {
 
 	grcpConn, err := grpc.Dial(
-		"127.0.0.1:8081",
+		"127.0.0.1:8085",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -21,11 +21,12 @@ func main() {
 	}
 	defer grcpConn.Close()
 
-	sessManager := servGrpc.NewUserClient(grcpConn)
+	sessManager := servGrpc.NewAuthClient(grcpConn)
 
-	cr := servGrpc.UserCheck{Login: "dw3234dw", Password: "5445"}
+	cr := servGrpc.Id{Id: "243424"}
 
-	wd, err := sessManager.CheckAccount(context.Background(), &cr)
+	wd, err := sessManager.GenerateAccessToken(context.Background(), &cr)
+
 	fmt.Println(wd.GetValue())
 
 }

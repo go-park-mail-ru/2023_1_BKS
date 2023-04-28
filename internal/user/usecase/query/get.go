@@ -8,14 +8,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type GetIdUserHandler struct {
+type GetUserHandler struct {
 	userRepo domain.RRepository
 	loger    *logrus.Entry
 }
 
-func (h GetIdUserHandler) Handle(
+func (h GetUserHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
 ) (domain.User, error) {
-	return h.userRepo.GetId(ctx, id)
+	return h.userRepo.Get(ctx, id)
+}
+
+type FindByIdUserHandler struct {
+	userRepo domain.RRepository
+	loger    *logrus.Entry
+}
+
+func (h FindByIdUserHandler) Handle(
+	ctx context.Context,
+	id uuid.UUID,
+) (domain.User, error) {
+	return h.userRepo.FindById(ctx, id)
 }

@@ -38,7 +38,32 @@ func (t UserPostgressRepository) AuthGetId(ctx context.Context, id uuid.UUID) (d
 	}, err
 }
 
-func (t UserPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domain.User, error) {
+func (t UserPostgressRepository) Get(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	var (
+		phoneNumber  string
+		name         string
+		pathToAvatar string
+		email        string
+		login        string
+		password     string
+	)
+
+	row := t.users.QueryRow("SELECT  email, login, password, phonenumber, name, pathtoavatar FROM users WHERE id = $1 LIMIT 1", id)
+	err := row.Scan(&email, &login, &password, &phoneNumber, &name, &pathToAvatar)
+
+	return domain.User{
+		Email:    email,
+		Login:    login,
+		Password: password,
+
+		PhoneNumber: phoneNumber,
+		Name:        name,
+
+		PathToAvatar: pathToAvatar,
+	}, err
+}
+
+func (t UserPostgressRepository) FindById(ctx context.Context, id uuid.UUID) (domain.User, error) {
 	var (
 		phoneNumber  string
 		name         string
@@ -75,10 +100,9 @@ func (t *UserPostgressRepository) Create(ctx context.Context, user domain.User) 
 }
 
 func (t *UserPostgressRepository) Update(ctx context.Context, user domain.User) error {
-	id, _ := uuid.Parse("978137d3-a263-4dc7-9308-43e35c0c83ff") // Тут должго быть получение значений из авторизированного пользователя
 	_, err := t.users.Exec("update users set email = $1,  phonenumber = $2, login = $3, password = $4, name = $5, pathtoavatar = $6 where id = $7",
 		user.Email, user.PhoneNumber, user.Login, user.Password, user.Name,
-		user.PathToAvatar, id)
+		user.PathToAvatar, user.Id)
 	return err
 }
 

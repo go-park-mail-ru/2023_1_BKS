@@ -17,8 +17,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	oapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
-
 	authmiddlevare "pkg/middleware"
 	serverGrpc "user/delivery/grpc"
 	v2 "user/delivery/http/v2"
@@ -106,9 +104,6 @@ func Run(cfg config.Config) {
 	}
 	e.Use(middleware.Logger())
 	e.Use(mw...)
-
-	e.Use(middleware.Logger())
-	e.Use(oapimiddleware.OapiRequestValidator(swagger))
 
 	v2.RegisterHandlers(e, &serverHandler)
 
