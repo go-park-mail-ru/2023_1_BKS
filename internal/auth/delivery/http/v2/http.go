@@ -40,7 +40,7 @@ func (d *HttpServer) Login(ctx echo.Context) error {
 	}
 
 	grcpConn, err := grpc.Dial(
-		"127.0.0.1:8081",
+		"user_service:8081",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
