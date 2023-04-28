@@ -1,6 +1,14 @@
 version: "3.9"
 services:
 
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    ports:
+      - 8080:80
+    
+
   auth-service:
     container_name: "auth_service"
     build: ./auth
@@ -13,7 +21,7 @@ services:
 
   user-service:
     container_name: "user_service"
-    build: ./
+    build: ./user
     ports:
       - "8080:8080"
     expose:
