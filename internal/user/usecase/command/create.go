@@ -18,9 +18,9 @@ func (h *CreateUserHandler) Handle(
 	ctx context.Context,
 	passwordCheck string,
 	userDelivery domain.User,
-) error {
+) (uuid.UUID, error) {
 	if userDelivery.Password != passwordCheck {
-		return domain.PassNonComporableErr{}
+		return uuid.UUID{}, domain.PassNonComporableErr{}
 	}
 
 	user := domain.User{
@@ -37,5 +37,5 @@ func (h *CreateUserHandler) Handle(
 		PathToAvatar: userDelivery.PathToAvatar,
 	}
 	err := h.userRepo.Create(ctx, user)
-	return err
+	return user.Id, err
 }

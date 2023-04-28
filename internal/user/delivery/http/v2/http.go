@@ -42,8 +42,6 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 	}
 
 	user := domain.User{
-		Id: uuid.New(),
-
 		Email:       newUser.Email,
 		PhoneNumber: newUser.PhoneNumber,
 
@@ -55,8 +53,14 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 		PathToAvatar: newUser.Avatar,
 	}
 
+	uuids, err := a.command.CreateUser.Handle(context.Background(), newUser.PasswordCheck, user)
+	if err != nil {
+		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	fmt.Println(user.Id)
 	grcpConn, err := grpc.Dial(
-		"127.0.0.1:8085",
+		"auth_service:8085",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -66,7 +70,7 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 
 	sessManager := servGrpc.NewAuthClient(grcpConn)
 
-	cr := servGrpc.Id{Id: user.Id.String()}
+	cr := servGrpc.Id{Id: uuids.String()}
 
 	fmt.Println(cr.GetId())
 
@@ -74,11 +78,6 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 
 	if wd.GetValue() == "" {
 		return sendUserError(ctx, http.StatusBadRequest, "Ошибка генерации токена")
-	}
-
-	err = a.command.CreateUser.Handle(context.Background(), newUser.PasswordCheck, user)
-	if err != nil {
-		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
 	return ctx.JSON(http.StatusCreated, wd.GetValue())
@@ -149,12 +148,12 @@ func (a HttpServer) GetUser(ctx echo.Context) error {
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
+	fmt.Println(uuids)
 
 	user, err = a.query.GetUser.Handle(context.Background(), uuids)
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
-	fmt.Println(23)
 	result := CreateUser{
 		Name:          user.Name,
 		Email:         user.Email,
