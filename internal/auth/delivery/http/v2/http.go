@@ -58,10 +58,13 @@ func (d *HttpServer) Login(ctx echo.Context) error {
 		return sendUserError(ctx, http.StatusBadRequest, "Ошибка логина или паролся")
 	}
 
-	result, err := d.command.CreateToken.CreateJWSWithClaims([]string{}, "appUniqFront", "auth")
+	claims := make(map[string]string)
+	claims["id"] = wd.GetValue()
+
+	result, err := d.command.CreateToken.CreateJWSWithClaims(claims, "appUniqFront", "auth")
 	if err != nil {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	return ctx.JSON(http.StatusOK, result)
+	return ctx.JSON(http.StatusOK, string(result))
 }

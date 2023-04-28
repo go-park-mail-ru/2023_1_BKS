@@ -3,16 +3,20 @@ package auth
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	serverGrpc "auth/delivery/grpc"
 
 	oapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
+	"google.golang.org/grpc"
 
 	v2 "auth/delivery/http/v2"
 	"auth/usecase"
@@ -41,8 +45,7 @@ func AsyncRunHTTP(e *echo.Echo) error {
 	return e.Shutdown(ctx)
 }
 
-/*
-func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) error {
+func AsyncRunGrpc(server *grpc.Server, lis net.Listener) error {
 	go func() {
 		err := server.Serve(lis)
 		if err != nil {
@@ -59,7 +62,7 @@ func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) erro
 
 	return nil
 }
-*/
+
 func Run() {
 	ctx := context.Background()
 
@@ -69,20 +72,19 @@ func Run() {
 		os.Exit(1)
 	}
 	swagger.Servers = nil
-	/*
-		lis, err := net.Listen("tcp", ":8081")
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
-			os.Exit(1)
-		}
-	*/
+
+	lis, err := net.Listen("tcp", ":8085")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+		os.Exit(1)
+	}
 	command, query := usecase.NewUsecase(ctx)
 
 	serverHandler := v2.CreateHttpServer(command, query)
 
-	//grpcHandler := serverGrpc.CreateGrpcServer(command, query)
+	grpcHandler := serverGrpc.CreateGrpcServer(command, query)
 
-	//server := grpc.NewServer()
+	server := grpc.NewServer()
 
 	e := echo.New()
 	/*
@@ -103,7 +105,17 @@ func Run() {
 
 	v2.RegisterHandlers(e, &serverHandler)
 
-	//serverGrpc.RegisterUserServer(server, &grpcHandler)
+	serverGrpc.RegisterAuthServer(server, &grpcHandler)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf("0.0.0.0:%d", 8082)))
+	errs := make(chan error, 2)
+	go func() {
+		errs <- AsyncRunHTTP(e)
+	}()
+
+	go func() {
+		errs <- AsyncRunGrpc(server, lis)
+	}()
+	err = <-errs
+
+	log.Warn("Terminating aplication:", err)
 }

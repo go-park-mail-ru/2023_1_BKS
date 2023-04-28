@@ -10,25 +10,18 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
-const PrivateKey = `-----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIN2dALnjdcZaIZg4QuA6Dw+kxiSW502kJfmBN3priIhPoAoGCCqGSM49
-AwEHoUQDQgAE4pPyvrB9ghqkT1Llk0A42lixkugFd/TBdOp6wf69O9Nndnp4+HcR
-s9SlG/8hjB2Hz42v4p3haKWv3uS1C6ahCQ==
------END EC PRIVATE KEY-----`
-
-const PermissionsClaim = "perm"
-const KeyID = `key-id`
-
 type CreateJWSHandle struct {
 	PrivateKey *ecdsa.PrivateKey
 	KeySet     jwk.Set
 }
 
-func (f *CreateJWSHandle) CreateJWSWithClaims(claims []string, audience string, issuer string) ([]byte, error) {
+func (f *CreateJWSHandle) CreateJWSWithClaims(claims map[string]string, audience string, issuer string) ([]byte, error) {
 	t := jwt.New()
-	err := t.Set(PermissionsClaim, claims)
-	if err != nil {
-		return nil, fmt.Errorf("setting permissions: %w", err)
+	for tag, claim := range claims {
+		err := t.Set(tag, claim)
+		if err != nil {
+			return nil, fmt.Errorf("setting payload: %w", err)
+		}
 	}
 	return f.SignToken(t)
 }
@@ -41,7 +34,7 @@ func (f *CreateJWSHandle) SignToken(t jwt.Token) ([]byte, error) {
 	if err := hdr.Set(jws.TypeKey, "JWT"); err != nil {
 		return nil, fmt.Errorf("setting type: %w", err)
 	}
-	if err := hdr.Set(jws.KeyIDKey, KeyID); err != nil {
+	if err := hdr.Set(jws.KeyIDKey, `key-id`); err != nil {
 		return nil, fmt.Errorf("setting Key ID: %w", err)
 	}
 	return jwt.Sign(t, jwa.ES256, f.PrivateKey, jwt.WithHeaders(hdr))
