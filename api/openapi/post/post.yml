@@ -29,7 +29,7 @@ paths:
                   type: array
                   items:
                     oneOf:
-                      - $ref: '#/components/schemas/GetPost'
+                      - $ref: '#/components/schemas/MiniPost'
           '204':
             description: Были просмотренны все объявления.
   
@@ -42,7 +42,7 @@ paths:
   /api/post:
     get:
       summary: Вернуть посты авторизированного пользователя.
-      operationId: getPost
+      operationId: Post
       security:
       - bearerAuth: []
       responses:
@@ -54,7 +54,7 @@ paths:
                  type: array
                  items:
                     oneOf:
-                      - $ref: '#/components/schemas/GetPost'
+                      - $ref: '#/components/schemas/MiniPost'
         default:
           description: Произошла ошибка.
           content:
@@ -72,7 +72,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Post'
+              $ref: '#/components/schemas/CreatePost'
       responses:
         '201':
           description: Объявление успешно создано.
@@ -99,7 +99,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPost'
+                $ref: '#/components/schemas/Post'
         default:
           description: Произошла ошибка.
           content:
@@ -186,7 +186,7 @@ paths:
                 $ref: '#/components/schemas/ErrorHTTP'
   /api/post/user/{id}:
     get:
-      summary: Вернуть объявление по id пользователя.
+      summary: Вернуть объявления по id пользователя.
       operationId: findPostByUserID
       parameters:
         - name: id
@@ -197,14 +197,14 @@ paths:
             type: string
       responses:
         '200':
-          description: Объявление получено.
+          description: Объявления получено.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   oneOf:
-                    - $ref: '#/components/schemas/GetPost'
+                    - $ref: '#/components/schemas/Post'
         '204':
             description: Были просмотренны все объявления.
         default:
@@ -213,9 +213,133 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
+                
+  /api/favorite/{id}:
+    post:
+      summary: Добавить объявление в избранное по id поста.
+      operationId: addFavoritePost
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID поста.
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Объявление добавлено.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+        
+    delete:
+      summary: Удалить объявление по id поста.
+      operationId: removeFavoritePost
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID поста.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Объявление удалено.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+                
+  /api/favorite/{page}:
+    get:
+      summary: Вернуть избранное пользователя.
+      operationId: addFavoritePodst
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: page
+          in: path
+          description: страница.
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Объявление добавлено.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+                
 
 components:
   schemas:
+    MiniPost:
+      allOf:
+        - required:
+            - UserId
+            - Title
+            - Name
+            - PostId
+            - Views
+            - Price
+            - ImageMassive
+          properties:
+            UserId:
+              type: string
+              description: ID пользователя.
+            Name:
+              type: string
+              description: Имя пользователя.
+            PostId:
+              type: string
+              description: ID объявления.
+            Title:
+              type: string
+              description: Названия объявления.
+            Views:
+              type: integer
+              description: Количество просмотров.
+            Price:
+              type: string
+              description: Цена объявления.
+            ImageMassive:
+              $ref: '#/components/schemas/ImageMassive'  
+  
+  
+    CreatePost:
+      allOf:
+        - required:
+            - UserId
+            - Title
+            - Description
+            - Price
+            - Close
+            - ImageMassive
+          properties:
+            Title:
+              type: string
+              description: Названия объявления.
+            Description:
+              type: string
+              description: Содержание объявления.
+            Price:
+              type: string
+              description: Цена объявления.
+            ImageMassive:
+              $ref: '#/components/schemas/ImageMassive'
+              
     Post:
       allOf:
         - required:
@@ -228,13 +352,19 @@ components:
           properties:
             UserId:
               type: string
-              description: Названия объявления.
+              description: Id пользователя.
             Title:
               type: string
               description: Названия объявления.
             Description:
               type: string
               description: Содержание объявления.
+            Views:
+              type: integer
+              description: Количество просмотров.
+            FavoriteAdd:
+              type: integer
+              description: Количество добавлений в избранное.
             Price:
               type: string
               description: Цена объявления.
@@ -244,33 +374,6 @@ components:
             ImageMassive:
               $ref: '#/components/schemas/ImageMassive'
               
-    GetPost:
-      allOf:
-        - required:
-            - UserId
-            - Title
-            - Description
-            - Price
-            - Close
-            - ImageMassive
-          properties:
-            UserId:
-              type: string
-              description: Названия объявления.
-            Title:
-              type: string
-              description: Названия объявления.
-            Description:
-              type: string
-              description: Содержание объявления.
-            Price:
-              type: string
-              description: Цена объявления.
-            Close:
-              type: boolean
-              description: Закрыто ли объявление.
-            ImageMassive:
-              $ref: '#/components/schemas/ImageMassive'
               
     ImageMassive:
       type: array

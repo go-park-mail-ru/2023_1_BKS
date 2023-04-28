@@ -8,4 +8,11 @@ CREATE TABLE posts (
     Tags   text[] NOT NULL,
     Images text[] NOT NULL,
     "time" timestamp NOT NULL,
+    Views integer,
 );
+
+CREATE TABLE favorite (
+    IdPost uuid PRIMARY KEY,
+    UserId uuid NOT NULL,
+);
+
