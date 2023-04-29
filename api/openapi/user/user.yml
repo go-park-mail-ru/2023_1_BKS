@@ -3,11 +3,6 @@ info:
   version: 1.0.0
   title: AppUniq <service User> API
   description: OpenApi 3.0 для сервиса user сайта AppUniq.
-servers:
-  - url: https://{hostname}/api
-    variables:
-      hostname:
-        default: localhost
 paths:
   /api/user:
     get:

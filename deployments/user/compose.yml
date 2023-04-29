@@ -7,30 +7,33 @@ services:
       - ./nginx:/etc/nginx/conf.d
     ports:
       - 8080:80
-    
+    depends_on:
+      - auth-service
+      - user-service
+    networks:
+      - appuniq-service
 
   auth-service:
     container_name: "auth_service"
     build: ./auth
-    ports:
-      - "8082:8082"
     expose:
+      - "8082"
       - "8085"
     networks:
-      - postgres-user-network
+      - appuniq-service
 
   user-service:
     container_name: "user_service"
     build: ./user
-    ports:
-      - "8080:8080"
     expose:
+      - "8080"
       - "8081"
     depends_on:
       postgres-user:
         condition: service_healthy
     networks:
       - postgres-user-network
+      - appuniq-service
 
   postgres-user:
     container_name: "postgres_user"
