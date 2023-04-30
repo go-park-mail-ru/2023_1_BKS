@@ -58,7 +58,6 @@ func (a *HttpServer) CreateUser(ctx echo.Context) error {
 		return sendUserError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	fmt.Println(user.Id)
 	grcpConn, err := grpc.Dial(
 		"auth_service:8085",
 		grpc.WithInsecure(),
