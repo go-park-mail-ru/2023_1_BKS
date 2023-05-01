@@ -3,10 +3,12 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"post/domain"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 type PostPostgressRepository struct {
@@ -27,17 +29,18 @@ func (t PostPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domai
 	)
 
 	row := t.posts.QueryRow("SELECT userid, title, description, views, price, close, tags, images, time FROM posts WHERE id = $1 LIMIT 1", id)
-	err := row.Scan(&userID, &title, &description, &price, &close, &tag, &pathImages, &time)
+	err := row.Scan(&userID, &title, &description, &views, &price, &close, &tag, pq.Array(&pathImages), &time)
 	if err != nil {
 		return domain.Post{}, err
 	}
-	_, err = t.posts.Exec("update posts set views = $1, where id = $2", views+1, id)
+	_, err = t.posts.Exec("update posts set views = $1 where id = $2", views+1, id)
 
 	return domain.Post{
+		Close:      close,
 		Id:         id,
 		UserID:     userID,
 		Title:      title,
-		Views:      views,
+		Views:      views + 1,
 		Desciption: description,
 		Price:      price,
 		Tags:       tag,
@@ -46,72 +49,122 @@ func (t PostPostgressRepository) GetId(ctx context.Context, id uuid.UUID) (domai
 	}, err
 }
 
-func (t PostPostgressRepository) GetByUserId(ctx context.Context, idUser uuid.UUID, number int) (domain.Post, error) {
-	var (
-		id          uuid.UUID
-		userID      uuid.UUID
-		title       string
-		description string
-		price       string
-		close       bool
-		time        time.Time
-		tag         string
-		images      []string
-	)
+func (t PostPostgressRepository) GetByTag(ctx context.Context, tag string, number int) ([]domain.Post, error) {
+	if number <= 0 {
+		return []domain.Post{}, nil // Ошибка страницы
+	}
 
-	row := t.posts.QueryRow("SELECT id, userid, title, description, price, close, tags, images, time FROM posts WHERE id = $1 ORDERED BY time LIMIT $2, 1", idUser, number-1)
-	err := row.Scan(&id, &userID, &title, &description, &price, &close, &tag, &images, &time)
-	return domain.Post{
-		Id:         id,
-		UserID:     userID,
-		Title:      title,
-		Desciption: description,
-		Price:      price,
-		Tags:       tag,
-		PathImages: images,
-		Time:       time,
-	}, err
+	rows, err := t.posts.Query(`SELECT id, userid, title, description,
+	price,  images, time FROM posts WHERE tags = $1 and close = false ORDER BY time LIMIT 10 OFFSET $2`, tag, (number-1)*10)
+	if err != nil {
+		return []domain.Post{}, err
+	}
+
+	var posts []domain.Post
+
+	for rows.Next() {
+		p := domain.Post{}
+		err = rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Desciption,
+			&p.Price, pq.Array(&p.PathImages), &p.Time)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, err
 }
 
-func (t PostPostgressRepository) GetSortNew(ctx context.Context, number int) (domain.Post, error) {
-	var (
-		id          uuid.UUID
-		userID      uuid.UUID
-		title       string
-		description string
-		price       string
-		close       bool
-		time        time.Time
-		tag         string
-		images      []string
-	)
+func (t PostPostgressRepository) GetByUserIdOpen(ctx context.Context, idUser uuid.UUID, number int) ([]domain.Post, error) {
+	if number <= 0 {
+		return []domain.Post{}, nil // Ошибка страницы
+	}
+	rows, err := t.posts.Query(`SELECT id, userid, title, description, price, 
+	 tags, images, time FROM posts WHERE userid = $1 and close = false ORDER BY time LIMIT 10 OFFSET $2`, idUser, (number-1)*10)
+	if err != nil {
+		return []domain.Post{}, err
+	}
 
-	row := t.posts.QueryRow("SELECT id, userid, title, description, price, close, tags, images, time FROM posts ORDERED BY time LIMIT $1, 1", number-1)
-	err := row.Scan(&id, &userID, &title, &description, &price, &close, &tag, &images, &time)
-	return domain.Post{
-		Id:         id,
-		UserID:     userID,
-		Title:      title,
-		Desciption: description,
-		Price:      price,
-		Tags:       tag,
-		PathImages: images,
-		Time:       time,
-	}, err
+	var posts []domain.Post
+
+	for rows.Next() {
+		p := domain.Post{}
+		err := rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Desciption,
+			&p.Price, &p.Tags, pq.Array(&p.PathImages), &p.Time)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, err
+}
+
+func (t PostPostgressRepository) GetByUserIdClose(ctx context.Context, idUser uuid.UUID, number int) ([]domain.Post, error) {
+	if number <= 0 {
+		return []domain.Post{}, nil // Ошибка страницы
+	}
+	rows, err := t.posts.Query(`SELECT id, userid, title, description, price, 
+	 tags, images, time FROM posts WHERE userid = $1 and close = true ORDER BY time LIMIT 10 OFFSET $2`, idUser, (number-1)*10)
+	if err != nil {
+		return []domain.Post{}, err
+	}
+
+	var posts []domain.Post
+
+	for rows.Next() {
+		p := domain.Post{}
+		err := rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Desciption,
+			&p.Price, &p.Tags, pq.Array(&p.PathImages), &p.Time)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, err
+}
+
+func (t PostPostgressRepository) GetSortNew(ctx context.Context, number int) ([]domain.Post, error) {
+	if number <= 0 {
+		return []domain.Post{}, nil // Ошибка страницы
+	}
+	rows, err := t.posts.Query(`SELECT id, userid, title, description,
+	price,  tags, images, time FROM posts WHERE close = false ORDER BY time LIMIT 10 OFFSET $1`, (number-1)*10)
+	if err != nil {
+		return []domain.Post{}, err
+	}
+
+	var posts []domain.Post
+
+	for rows.Next() {
+		p := domain.Post{}
+		err = rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Desciption,
+			&p.Price, &p.Tags, pq.Array(&p.PathImages), &p.Time)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, err
 }
 
 func (t *PostPostgressRepository) Create(ctx context.Context, post domain.Post) error {
-	_, err := t.posts.Exec("insert into posts (id, userid, title, description, price, close, tags, images, time) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+	_, err := t.posts.Exec("insert into posts (id, userid, title, description, price, close, tags, images, time, views) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 		post.Id, post.UserID, post.Title, post.Desciption, post.Price, post.Close,
-		post.Tags, post.PathImages, post.Time)
+		post.Tags, pq.Array(post.PathImages), post.Time, 0)
 	return err
 }
 
 func (t *PostPostgressRepository) Update(ctx context.Context, post domain.Post) error {
-	id, _ := uuid.Parse("978137d3-a263-4dc7-9308-43e35c0c83ff") // Тут должго быть получение значений из авторизированного пользователя
-	_, err := t.posts.Exec("update posts set  userid = $1, title = $2, description = $3, price = $4, close = $5, tags = $6, images = $7,  where id = $8",
-		post.UserID, post.Title, post.Desciption, post.Price, post.Close,
-		post.Tags, post.PathImages, id)
+	_, err := t.posts.Exec("update posts set  userid = $1, title = $2, description = $3, price = $4,  tags = $5, images = $6  where id = $7",
+		post.UserID, post.Title, post.Desciption, post.Price,
+		post.Tags, pq.Array(post.PathImages), post.Id)
 	return err
 }
 
@@ -121,7 +174,6 @@ func (t *PostPostgressRepository) Delete(ctx context.Context, id uuid.UUID) erro
 }
 
 func (t *PostPostgressRepository) Close(ctx context.Context, id uuid.UUID) error {
-	close := true
-	_, err := t.posts.Exec("update posts set close = $1 where id = &2", close, id)
+	_, err := t.posts.Exec("update posts set close = true where id = $1", id)
 	return err
 }

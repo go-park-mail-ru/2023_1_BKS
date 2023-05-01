@@ -15,6 +15,8 @@ type CUDRepository interface {
 
 type RRepository interface {
 	GetId(ctx context.Context, id uuid.UUID) (Post, error)
-	GetByUserId(ctx context.Context, idUser uuid.UUID, number int) (Post, error)
-	GetSortNew(ctx context.Context, number int) (Post, error)
+	GetByUserIdOpen(ctx context.Context, idUser uuid.UUID, number int) ([]Post, error)
+	GetByUserIdClose(ctx context.Context, idUser uuid.UUID, number int) ([]Post, error)
+	GetByTag(ctx context.Context, tag string, number int) ([]Post, error)
+	GetSortNew(ctx context.Context, number int) ([]Post, error)
 }

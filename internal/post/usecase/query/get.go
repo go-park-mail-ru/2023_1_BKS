@@ -20,17 +20,30 @@ func (h GetIdHandler) Handle(
 	return h.postRepo.GetId(ctx, id)
 }
 
-type GetByUserIdHandler struct {
+type GetByUserIdOpenHandler struct {
 	postRepo domain.RRepository
 	loger    *logrus.Entry
 }
 
-func (h GetByUserIdHandler) Handle(
+func (h GetByUserIdOpenHandler) Handle(
 	ctx context.Context,
 	idUser uuid.UUID,
 	number int,
-) (domain.Post, error) {
-	return h.postRepo.GetByUserId(ctx, idUser, number)
+) ([]domain.Post, error) {
+	return h.postRepo.GetByUserIdOpen(ctx, idUser, number)
+}
+
+type GetByUserIdCloseHandler struct {
+	postRepo domain.RRepository
+	loger    *logrus.Entry
+}
+
+func (h GetByUserIdCloseHandler) Handle(
+	ctx context.Context,
+	idUser uuid.UUID,
+	number int,
+) ([]domain.Post, error) {
+	return h.postRepo.GetByUserIdClose(ctx, idUser, number)
 }
 
 type GetSortNewHandler struct {
@@ -41,6 +54,19 @@ type GetSortNewHandler struct {
 func (h GetSortNewHandler) Handle(
 	ctx context.Context,
 	number int,
-) (domain.Post, error) {
+) ([]domain.Post, error) {
 	return h.postRepo.GetSortNew(ctx, number)
+}
+
+type GetTagHandler struct {
+	postRepo domain.RRepository
+	loger    *logrus.Entry
+}
+
+func (h GetTagHandler) Handle(
+	ctx context.Context,
+	tag string,
+	number int,
+) ([]domain.Post, error) {
+	return h.postRepo.GetByTag(ctx, tag, number)
 }

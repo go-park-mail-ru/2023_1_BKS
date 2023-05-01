@@ -29,8 +29,10 @@ func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 			ClosePost:  command.NewCloseHandler(&postRepository, validator, logger),
 		},
 		Queries{
-			GetIdPost:      query.NewGetIdHandler(postRepository, logger),
-			GetSortNewPost: query.NewGetSortNewHandler(postRepository, logger),
-			GetUserIdPost:  query.NewGetByUserIdHandler(postRepository, logger),
+			GetIdPost:          query.NewGetIdHandler(postRepository, logger),
+			GetSortNewPost:     query.NewGetSortNewHandler(postRepository, logger),
+			GetUserIdOpenPost:  query.NewGetByUserIdOpenHandler(postRepository, logger),
+			GetUserIdClosePost: query.NewGetByUserIdCloseHandler(postRepository, logger),
+			GetTagPost:         query.NewGetByTagHandler(postRepository, logger),
 		}
 }

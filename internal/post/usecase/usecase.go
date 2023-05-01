@@ -15,7 +15,9 @@ type Commands struct {
 
 // В данном агрегате перечисленны все запросы сервиса объявлений
 type Queries struct {
-	GetIdPost      query.GetIdHandler
-	GetUserIdPost  query.GetByUserIdHandler
-	GetSortNewPost query.GetSortNewHandler
+	GetIdPost          query.GetIdHandler
+	GetUserIdOpenPost  query.GetByUserIdOpenHandler
+	GetUserIdClosePost query.GetByUserIdCloseHandler
+	GetSortNewPost     query.GetSortNewHandler
+	GetTagPost         query.GetTagHandler
 }

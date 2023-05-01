@@ -21,14 +21,17 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Закрыть объявление.
-	// (PUT /api/close/{id})
-	ClosePost(ctx echo.Context, id string) error
+	// (PUT /api/close/{userId}/{id})
+	ClosePost(ctx echo.Context, userId string, id string) error
 	// Создать новое объявление.
 	// (POST /api/post)
 	CreatePost(ctx echo.Context) error
-	// Вернуть объявления по id пользователя.
-	// (GET /api/post/user/{idUser}/{page})
-	FindPostByUserID(ctx echo.Context, idUser string, page int) error
+	// Вернуть закрытые объявления по id пользователя.
+	// (GET /api/post/close/user/{idUser}/{page})
+	FindClosePostByUserID(ctx echo.Context, idUser string, page int) error
+	// Вернуть открытые объявления по id пользователя.
+	// (GET /api/post/open/user/{idUser}/{page})
+	FindOpenPostByUserID(ctx echo.Context, idUser string, page int) error
 	// Удалить объявление.
 	// (DELETE /api/post/{id})
 	DeletePost(ctx echo.Context, id string) error
@@ -38,6 +41,9 @@ type ServerInterface interface {
 	// Обновить объявление.
 	// (PUT /api/post/{id})
 	UpdatePost(ctx echo.Context, id string) error
+	// Вернуть объявления по тегу.
+	// (GET /api/post/{tag}/{page})
+	FindPostByTag(ctx echo.Context, tag string, page int) error
 	// Основнвая страница
 	// (GET /api/sort/new/{page})
 	GetAllPost(ctx echo.Context, page int) error
@@ -51,6 +57,14 @@ type ServerInterfaceWrapper struct {
 // ClosePost converts echo context to params.
 func (w *ServerInterfaceWrapper) ClosePost(ctx echo.Context) error {
 	var err error
+	// ------------- Path parameter "userId" -------------
+	var userId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "userId", runtime.ParamLocationPath, ctx.Param("userId"), &userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter userId: %s", err))
+	}
+
 	// ------------- Path parameter "id" -------------
 	var id string
 
@@ -62,7 +76,7 @@ func (w *ServerInterfaceWrapper) ClosePost(ctx echo.Context) error {
 	ctx.Set(BearerAuthScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ClosePost(ctx, id)
+	err = w.Handler.ClosePost(ctx, userId, id)
 	return err
 }
 
@@ -77,8 +91,8 @@ func (w *ServerInterfaceWrapper) CreatePost(ctx echo.Context) error {
 	return err
 }
 
-// FindPostByUserID converts echo context to params.
-func (w *ServerInterfaceWrapper) FindPostByUserID(ctx echo.Context) error {
+// FindClosePostByUserID converts echo context to params.
+func (w *ServerInterfaceWrapper) FindClosePostByUserID(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "idUser" -------------
 	var idUser string
@@ -97,7 +111,31 @@ func (w *ServerInterfaceWrapper) FindPostByUserID(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.FindPostByUserID(ctx, idUser, page)
+	err = w.Handler.FindClosePostByUserID(ctx, idUser, page)
+	return err
+}
+
+// FindOpenPostByUserID converts echo context to params.
+func (w *ServerInterfaceWrapper) FindOpenPostByUserID(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "idUser" -------------
+	var idUser string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "idUser", runtime.ParamLocationPath, ctx.Param("idUser"), &idUser)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter idUser: %s", err))
+	}
+
+	// ------------- Path parameter "page" -------------
+	var page int
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "page", runtime.ParamLocationPath, ctx.Param("page"), &page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.FindOpenPostByUserID(ctx, idUser, page)
 	return err
 }
 
@@ -153,6 +191,30 @@ func (w *ServerInterfaceWrapper) UpdatePost(ctx echo.Context) error {
 	return err
 }
 
+// FindPostByTag converts echo context to params.
+func (w *ServerInterfaceWrapper) FindPostByTag(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "tag" -------------
+	var tag string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "tag", runtime.ParamLocationPath, ctx.Param("tag"), &tag)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter tag: %s", err))
+	}
+
+	// ------------- Path parameter "page" -------------
+	var page int
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "page", runtime.ParamLocationPath, ctx.Param("page"), &page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.FindPostByTag(ctx, tag, page)
+	return err
+}
+
 // GetAllPost converts echo context to params.
 func (w *ServerInterfaceWrapper) GetAllPost(ctx echo.Context) error {
 	var err error
@@ -197,12 +259,14 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.PUT(baseURL+"/api/close/:id", wrapper.ClosePost)
+	router.PUT(baseURL+"/api/close/:userId/:id", wrapper.ClosePost)
 	router.POST(baseURL+"/api/post", wrapper.CreatePost)
-	router.GET(baseURL+"/api/post/user/:idUser/:page", wrapper.FindPostByUserID)
+	router.GET(baseURL+"/api/post/close/user/:idUser/:page", wrapper.FindClosePostByUserID)
+	router.GET(baseURL+"/api/post/open/user/:idUser/:page", wrapper.FindOpenPostByUserID)
 	router.DELETE(baseURL+"/api/post/:id", wrapper.DeletePost)
 	router.GET(baseURL+"/api/post/:id", wrapper.FindPostByID)
 	router.PUT(baseURL+"/api/post/:id", wrapper.UpdatePost)
+	router.GET(baseURL+"/api/post/:tag/:page", wrapper.FindPostByTag)
 	router.GET(baseURL+"/api/sort/new/:page", wrapper.GetAllPost)
 
 }
@@ -210,28 +274,30 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"xA+L1K+kk3cn/icAAP//VxIHGk0hAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

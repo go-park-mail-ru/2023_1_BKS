@@ -114,7 +114,7 @@ func (a *HttpServer) DeletePost(ctx echo.Context, id string) error {
 	return ctx.JSON(http.StatusCreated, "Ok")
 }
 
-func (a *HttpServer) ClosePost(ctx echo.Context, id string) error {
+func (a *HttpServer) ClosePost(ctx echo.Context, userId string, id string) error {
 	uuidPost, err := uuid.Parse(id)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
@@ -140,6 +140,7 @@ func (a HttpServer) FindPostByID(ctx echo.Context, id string) error {
 	}
 
 	result := Post{
+		Tag:         resultDTO.Tags,
 		Close:       resultDTO.Close,
 		Description: resultDTO.Desciption,
 		PathImages:  resultDTO.PathImages,
@@ -152,25 +153,79 @@ func (a HttpServer) FindPostByID(ctx echo.Context, id string) error {
 	return ctx.JSON(http.StatusCreated, result)
 }
 
-func (a HttpServer) FindPostByUserID(ctx echo.Context, idUser string, page int) error {
+func (a HttpServer) FindOpenPostByUserID(ctx echo.Context, idUser string, page int) error {
 	uuidUser, err := uuid.Parse(idUser)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	resultDTO, err := a.query.GetUserIdPost.Handle(context.Background(), uuidUser, page)
+	resultDTO, err := a.query.GetUserIdOpenPost.Handle(context.Background(), uuidUser, page)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	result := Post{
-		Close:       resultDTO.Close,
-		Description: resultDTO.Desciption,
-		PathImages:  resultDTO.PathImages,
-		Price:       resultDTO.Price,
-		Title:       resultDTO.Title,
-		UserId:      resultDTO.UserID.String(),
-		Views:       resultDTO.Views,
+	var result []Post
+	for _, post := range resultDTO {
+		p := Post{
+			Close:       post.Close, // В реальности надо сделать не обязательныим полем
+			Description: post.Desciption,
+			PathImages:  post.PathImages,
+			Price:       post.Price,
+			Title:       post.Title,
+			UserId:      post.UserID.String(),
+			Views:       post.Views,
+		}
+		result = append(result, p)
+	}
+
+	return ctx.JSON(http.StatusCreated, result)
+}
+
+func (a HttpServer) FindClosePostByUserID(ctx echo.Context, idUser string, page int) error {
+	uuidUser, err := uuid.Parse(idUser)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	resultDTO, err := a.query.GetUserIdClosePost.Handle(context.Background(), uuidUser, page)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	var result []Post
+	for _, post := range resultDTO {
+		p := Post{
+			Close:       post.Close, // В реальности надо сделать не обязательныим полем
+			Description: post.Desciption,
+			PathImages:  post.PathImages,
+			Price:       post.Price,
+			Title:       post.Title,
+			UserId:      post.UserID.String(),
+			Views:       post.Views,
+		}
+		result = append(result, p)
+	}
+
+	return ctx.JSON(http.StatusCreated, result)
+}
+
+func (a HttpServer) FindPostByTag(ctx echo.Context, tag string, page int) error {
+	resultDTO, err := a.query.GetTagPost.Handle(context.Background(), tag, page)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	var result []MiniPost
+	for _, post := range resultDTO {
+		p := MiniPost{
+			PostId:     post.Id.String(),
+			PathImages: post.PathImages,
+			Price:      post.Price,
+			Title:      post.Title,
+			UserId:     post.UserID.String(),
+			Views:      post.Views,
+		}
+		result = append(result, p)
 	}
 
 	return ctx.JSON(http.StatusCreated, result)
@@ -182,14 +237,17 @@ func (a HttpServer) GetAllPost(ctx echo.Context, page int) error {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	result := Post{
-		Close:       resultDTO.Close,
-		Description: resultDTO.Desciption,
-		PathImages:  resultDTO.PathImages,
-		Price:       resultDTO.Price,
-		Title:       resultDTO.Title,
-		UserId:      resultDTO.UserID.String(),
-		Views:       resultDTO.Views,
+	var result []MiniPost
+	for _, post := range resultDTO {
+		p := MiniPost{
+			PostId:     post.Id.String(),
+			PathImages: post.PathImages,
+			Price:      post.Price,
+			Title:      post.Title,
+			UserId:     post.UserID.String(),
+			Views:      post.Views,
+		}
+		result = append(result, p)
 	}
 
 	return ctx.JSON(http.StatusCreated, result)

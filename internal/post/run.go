@@ -15,7 +15,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
 
 	v2 "post/delivery/http/v2"
 )
@@ -93,9 +92,5 @@ func Run(cfg config.Config) {
 	e.Use(mw...)
 
 	v2.RegisterHandlers(e, &serverHandler)
-	errs := make(chan error, 1)
-	go func() {
-		errs <- AsyncRunHTTP(e, cfg)
-	}()
-	log.Warn("Terminating aplication:", err)
+	e.Logger.Fatal(e.Start(fmt.Sprintf("0.0.0.0:%d", cfg.Http.Port)))
 }

@@ -20,9 +20,23 @@ func NewGetSortNewHandler(
 	return GetSortNewHandler{postRepo: postRepo, loger: loger}
 }
 
-func NewGetByUserIdHandler(
+func NewGetByUserIdOpenHandler(
 	postRepo domain.RRepository,
 	loger *logrus.Entry,
-) GetByUserIdHandler {
-	return GetByUserIdHandler{postRepo: postRepo, loger: loger}
+) GetByUserIdOpenHandler {
+	return GetByUserIdOpenHandler{postRepo: postRepo, loger: loger}
+}
+
+func NewGetByUserIdCloseHandler(
+	postRepo domain.RRepository,
+	loger *logrus.Entry,
+) GetByUserIdCloseHandler {
+	return GetByUserIdCloseHandler{postRepo: postRepo, loger: loger}
+}
+
+func NewGetByTagHandler(
+	postRepo domain.RRepository,
+	loger *logrus.Entry,
+) GetTagHandler {
+	return GetTagHandler{postRepo: postRepo, loger: loger}
 }

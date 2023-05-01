@@ -136,7 +136,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
-  /api/close/{id}:
+  /api/close/{userId}/{id}:
     put:
       summary: Закрыть объявление.
       operationId: closePost
@@ -146,6 +146,12 @@ paths:
         - name: id
           in: path
           description: ID объявления.
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: ID поьзователя.
           required: true
           schema:
             type: string
@@ -162,10 +168,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
-  /api/post/user/{idUser}/{page}:
+  /api/post/open/user/{idUser}/{page}:
     get:
-      summary: Вернуть объявления по id пользователя.
-      operationId: findPostByUserID
+      summary: Вернуть открытые объявления по id пользователя.
+      operationId: findOpenPostByUserID
+      parameters:
+        - name: idUser
+          in: path
+          description: ID пользоввателя.
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: path
+          description: Старница.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Объявления получено.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Post'
+        '204':
+            description: Были просмотренны все объявления.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
+  
+  /api/post/close/user/{idUser}/{page}:
+    get:
+      summary: Вернуть закрытые объявления по id пользователя.
+      operationId: findClosePostByUserID
       parameters:
         - name: idUser
           in: path
@@ -198,6 +240,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
                 
+  /api/post/{tag}/{page}:
+    get:
+      summary: Вернуть объявления по тегу.
+      operationId: findPostByTag
+      parameters:
+        - name: tag
+          in: path
+          description: Тег.
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: path
+          description: Старница.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Объявления получено.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/MiniPost'
+        '204':
+            description: Были просмотренны все объявления.
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
 
 
 components:
@@ -207,7 +284,6 @@ components:
         - required:
             - UserId
             - Title
-            - Name
             - PostId
             - Views
             - Price
@@ -216,9 +292,6 @@ components:
             UserId:
               type: string
               description: ID пользователя.
-            Name:
-              type: string
-              description: Имя пользователя.
             PostId:
               type: string
               description: ID объявления.

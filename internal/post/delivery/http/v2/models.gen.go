@@ -34,8 +34,6 @@ type ErrorHTTP struct {
 
 // MiniPost defines model for MiniPost.
 type MiniPost struct {
-	// Name Имя пользователя.
-	Name       string   `json:"Name"`
 	PathImages []string `json:"PathImages"`
 
 	// PostId ID объявления.
