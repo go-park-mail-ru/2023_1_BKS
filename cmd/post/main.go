@@ -1,12 +1,12 @@
 package main
 
 import (
-	"config"
-	"user"
+	"post"
+	"post/config"
 )
 
 func main() {
 	cfg := config.CreateConfig()
 
-	user.Run(cfg)
+	post.Run(cfg)
 }

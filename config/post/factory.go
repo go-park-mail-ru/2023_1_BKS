@@ -10,19 +10,19 @@ func CreateConfig() Config {
 }
 
 func CreateHttpConfig() HttpConfig {
-	return HttpConfig{8080}
+	return HttpConfig{8083}
 }
 
 func CreateGrcpConfig() GrcpConfig {
-	return GrcpConfig{8081}
+	return GrcpConfig{8084}
 }
 
 func CreateDataBaseConfig() DataBaseConfig {
 	return DataBaseConfig{
 		User:         "appuniq",
-		DataBaseName: "user",
+		DataBaseName: "post",
 		Password:     "uniq123",
-		Host:         "127.0.0.1",
+		Host:         "localhost",
 		Port:         5432,
 		Sslmode:      "disable",
 	}

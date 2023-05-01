@@ -19,3 +19,10 @@ func NewGetSortNewHandler(
 ) GetSortNewHandler {
 	return GetSortNewHandler{postRepo: postRepo, loger: loger}
 }
+
+func NewGetByUserIdHandler(
+	postRepo domain.RRepository,
+	loger *logrus.Entry,
+) GetByUserIdHandler {
+	return GetByUserIdHandler{postRepo: postRepo, loger: loger}
+}

@@ -20,6 +20,19 @@ func (h GetIdHandler) Handle(
 	return h.postRepo.GetId(ctx, id)
 }
 
+type GetByUserIdHandler struct {
+	postRepo domain.RRepository
+	loger    *logrus.Entry
+}
+
+func (h GetByUserIdHandler) Handle(
+	ctx context.Context,
+	idUser uuid.UUID,
+	number int,
+) (domain.Post, error) {
+	return h.postRepo.GetByUserId(ctx, idUser, number)
+}
+
 type GetSortNewHandler struct {
 	postRepo domain.RRepository
 	loger    *logrus.Entry
@@ -27,7 +40,7 @@ type GetSortNewHandler struct {
 
 func (h GetSortNewHandler) Handle(
 	ctx context.Context,
-	number uint,
+	number int,
 ) (domain.Post, error) {
 	return h.postRepo.GetSortNew(ctx, number)
 }

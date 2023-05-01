@@ -3,46 +3,68 @@ package post
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"os/signal"
 	"post/config"
+	"post/usecase"
+	"syscall"
+	"time"
 
-	oapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
+	authmiddlevare "pkg/middleware"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/sirupsen/logrus"
+	"github.com/labstack/gommon/log"
 
 	v2 "post/delivery/http/v2"
-	"post/domain"
-	"post/repository"
-	app "post/usecase"
-	"post/usecase/command"
-	"post/usecase/query"
 )
 
-func NewApplication(ctx context.Context, cfg config.Config) (app.Commands, app.Queries) {
-	dsn := fmt.Sprintf("post=%s dbname=%s password=%s host=%s port=%d sslmode=%s",
-		cfg.Db.User, cfg.Db.DataBaseName, cfg.Db.Password, cfg.Db.Host,
-		cfg.Db.Port, cfg.Db.Sslmode)
-	validator := domain.CreateSpecificationManager(cfg)
-
-	postRepository := repository.CreatePostgressRepository(dsn)
-	logger := logrus.NewEntry(logrus.StandardLogger())
-
-	return app.Commands{
-			Create: command.NewCreateHandler(&postRepository, validator, logger),
-			Update: command.NewUpdateHandler(&postRepository, validator, logger),
-			Delete: command.NewDeleteHandler(&postRepository, validator, logger),
-			Close:  command.NewCloseHandler(&postRepository, validator, logger),
-		},
-		app.Queries{
-			GetId:      query.NewGetIdHandler(postRepository, logger),
-			GetSortNew: query.NewGetSortNewHandler(postRepository, logger),
+func AsyncRunHTTP(e *echo.Echo, cfg config.Config) error {
+	go func() {
+		err := e.Start(fmt.Sprintf("0.0.0.0:%d", cfg.Http.Port))
+		if err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
 		}
+	}()
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+	<-interrupt
+
+	timeout := time.Duration(10)
+	if timeout == 0 {
+		timeout = 10 * time.Second
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return e.Shutdown(ctx)
 }
+
+// func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) error {
+// 	go func() {
+// 		err := server.Serve(lis)
+// 		if err != nil {
+// 			fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+// 			os.Exit(1)
+// 		}
+// 	}()
+
+// 	interrupt := make(chan os.Signal, 1)
+// 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+// 	<-interrupt
+
+// 	server.GracefulStop()
+
+// 	return nil
+// }
 
 func Run(cfg config.Config) {
 
 	ctx := context.Background()
+
 	swagger, err := v2.GetSwagger()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Ошибка загрузки спецификации swagger\n: %s", err)
@@ -50,12 +72,30 @@ func Run(cfg config.Config) {
 	}
 	swagger.Servers = nil
 
-	command, query := NewApplication(ctx, cfg)
+	command, query := usecase.NewUsecase(ctx, cfg)
 
 	serverHandler := v2.CreateHttpServer(command, query)
+
 	e := echo.New()
+
+	fa, err := authmiddlevare.NewInstanceAuthenticator()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+		os.Exit(1)
+	}
+
+	mw, err := authmiddlevare.CreateMiddleware(fa, swagger, "AppUniqFrontend", "AppUniqUser")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
+		os.Exit(1)
+	}
 	e.Use(middleware.Logger())
-	e.Use(oapimiddleware.OapiRequestValidator(swagger))
+	e.Use(mw...)
+
 	v2.RegisterHandlers(e, &serverHandler)
-	e.Logger.Fatal(e.Start(fmt.Sprintf("0.0.0.0:%d", cfg.Http.Port)))
+	errs := make(chan error, 1)
+	go func() {
+		errs <- AsyncRunHTTP(e, cfg)
+	}()
+	log.Warn("Terminating aplication:", err)
 }

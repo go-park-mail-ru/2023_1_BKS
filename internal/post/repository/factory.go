@@ -9,6 +9,7 @@ import (
 
 func CreatePostgressRepository(dsn string) PostPostgressRepository {
 	db, err := sql.Open("pgx", dsn)
+
 	if err != nil {
 		log.Fatalln("Не удается спарсить конфигурацию:", err)
 	}

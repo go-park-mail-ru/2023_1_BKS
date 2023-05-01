@@ -28,7 +28,6 @@ func (h *UpdateHandler) Handle(
 		Price:      postDelivery.Price,
 		Tags:       postDelivery.Tags,
 		PathImages: postDelivery.PathImages,
-		Time:       postDelivery.Time,
 	}
 	err := h.postRepo.Update(ctx, post)
 	return err

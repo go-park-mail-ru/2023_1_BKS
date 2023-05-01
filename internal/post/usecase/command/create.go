@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"post/domain"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -27,7 +28,7 @@ func (h *CreateHandler) Handle(
 		Price:      postDelivery.Price,
 		Tags:       postDelivery.Tags,
 		PathImages: postDelivery.PathImages,
-		Time:       postDelivery.Time,
+		Time:       time.Now(),
 	}
 	err := h.postRepo.Create(ctx, post)
 	return err

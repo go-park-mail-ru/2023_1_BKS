@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+
+  postgres-post:
+    container_name: "postgres_post"
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "post"
+      POSTGRES_USER: "appuniq"
+      POSTGRES_PASSWORD: "uniq123"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuniq -d post"]
+      interval: 4s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - ./post/init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  # postgres-post:
+  #   container_name: "postgres_post"
+  #   image: postgres
+  #   expose:
+  #     - "5432"
+  #   environment:
+  #     POSTGRES_DB: "user"
+  #     POSTGRES_USER: "appuniq"
+  #     POSTGRES_PASSWORD: "uniq123"
+  #   healthcheck:
+  #       test: ["CMD-SHELL", "pg_isready -U appuniq -d user"]
+  #       interval: 4s
+  #       timeout: 3s
+  #       retries: 5
+  #   volumes:
+  #     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   networks:
+  #     - postgres-post-network
+

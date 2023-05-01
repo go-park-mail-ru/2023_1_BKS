@@ -13,7 +13,8 @@ type Post struct {
 	Title      string
 	Desciption string
 	Price      string
-	Tags       []string
+	Tags       string
 	PathImages []string
 	Time       time.Time
+	Views      int
 }
