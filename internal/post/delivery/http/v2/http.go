@@ -29,6 +29,10 @@ type HttpServer struct {
 	query   app.Queries
 }
 
+// ///////////////////////////////////////////////////////////////////////////////////////////
+// Посты
+// ///////////////////////////////////////////////////////////////////////////////////////////
+
 func (a *HttpServer) CreatePost(ctx echo.Context) error {
 	var post CreatePost
 
@@ -311,6 +315,72 @@ func (a HttpServer) GetCart(ctx echo.Context) error {
 	}
 
 	resultDTO, err := a.query.GetCart.Handle(context.Background(), userId)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	return ctx.JSON(http.StatusOK, resultDTO)
+}
+
+// ///////////////////////////////////////////////////////////////////////////////////////////
+// Избранное
+// ///////////////////////////////////////////////////////////////////////////////////////////
+
+func (a HttpServer) AddFavorite(ctx echo.Context, id string) error {
+	postId, err := uuid.Parse(id)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	headerAuth := ctx.Request().Header.Get("Authorization")
+	user := jwt.ClaimParse(headerAuth, "id")
+
+	userId, err := uuid.Parse(user)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	err = a.command.AddFavorite.Handle(context.Background(), userId, postId)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	return ctx.JSON(http.StatusCreated, "Ok")
+}
+
+func (a HttpServer) RemoveFavorite(ctx echo.Context, id string) error {
+	postId, err := uuid.Parse(id)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	headerAuth := ctx.Request().Header.Get("Authorization")
+	user := jwt.ClaimParse(headerAuth, "id")
+
+	userId, err := uuid.Parse(user)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	err = a.command.RemoveFavorite.Handle(context.Background(), userId, postId)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	return ctx.JSON(http.StatusCreated, "Ok")
+}
+
+func (a HttpServer) GetFavorite(ctx echo.Context) error {
+
+	headerAuth := ctx.Request().Header.Get("Authorization")
+	user := jwt.ClaimParse(headerAuth, "id")
+
+	userId, err := uuid.Parse(user)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	resultDTO, err := a.query.GetFavorite.Handle(context.Background(), userId)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}

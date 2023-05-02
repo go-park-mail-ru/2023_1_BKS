@@ -82,3 +82,15 @@ func (h GetCartHandler) Handle(
 ) ([]string, error) {
 	return h.cartRepo.Get(ctx, userId)
 }
+
+type GetFavoriteHandler struct {
+	postRepo domain.RRepository
+	loger    *logrus.Entry
+}
+
+func (h GetFavoriteHandler) Handle(
+	ctx context.Context,
+	userId uuid.UUID,
+) ([]string, error) {
+	return h.postRepo.GetFavorite(ctx, userId)
+}

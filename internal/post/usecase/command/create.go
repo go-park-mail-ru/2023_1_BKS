@@ -48,3 +48,18 @@ func (h *AddCartHandler) Handle(
 	err := h.cartRepo.Add(ctx, userId, postId)
 	return err
 }
+
+type AddFavoriteHandler struct {
+	postRepo  domain.CUDRepository
+	validator domain.SpecificationManager
+	loger     *logrus.Entry
+}
+
+func (h *AddFavoriteHandler) Handle(
+	ctx context.Context,
+	userId uuid.UUID,
+	postId uuid.UUID,
+) error {
+	err := h.postRepo.AddFavorite(ctx, userId, postId)
+	return err
+}

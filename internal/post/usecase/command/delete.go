@@ -36,3 +36,18 @@ func (h *RemoveCartHandler) Handle(
 	err := h.cartRepo.Remove(ctx, userId, postId)
 	return err
 }
+
+type RemoveFavoriteHandler struct {
+	postRepo  domain.CUDRepository
+	validator domain.SpecificationManager
+	loger     *logrus.Entry
+}
+
+func (h *RemoveFavoriteHandler) Handle(
+	ctx context.Context,
+	userId uuid.UUID,
+	postId uuid.UUID,
+) error {
+	err := h.postRepo.RemoveFavorite(ctx, userId, postId)
+	return err
+}

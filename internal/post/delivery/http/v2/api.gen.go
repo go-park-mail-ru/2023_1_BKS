@@ -32,6 +32,15 @@ type ServerInterface interface {
 	// Закрыть объявление.
 	// (PUT /api/close/{userId}/{id})
 	ClosePost(ctx echo.Context, userId string, id string) error
+	// Вернуть избранное.
+	// (GET /api/favorite)
+	GetFavorite(ctx echo.Context) error
+	// Удалить из избранных товар.
+	// (DELETE /api/favorite/{id})
+	RemoveFavorite(ctx echo.Context, id string) error
+	// Добавить в избранное.
+	// (POST /api/favorite/{id})
+	AddFavorite(ctx echo.Context, id string) error
 	// Создать новое объявление.
 	// (POST /api/post)
 	CreatePost(ctx echo.Context) error
@@ -133,6 +142,53 @@ func (w *ServerInterfaceWrapper) ClosePost(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.ClosePost(ctx, userId, id)
+	return err
+}
+
+// GetFavorite converts echo context to params.
+func (w *ServerInterfaceWrapper) GetFavorite(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetFavorite(ctx)
+	return err
+}
+
+// RemoveFavorite converts echo context to params.
+func (w *ServerInterfaceWrapper) RemoveFavorite(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.RemoveFavorite(ctx, id)
+	return err
+}
+
+// AddFavorite converts echo context to params.
+func (w *ServerInterfaceWrapper) AddFavorite(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.AddFavorite(ctx, id)
 	return err
 }
 
@@ -319,6 +375,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/api/cart/:id", wrapper.RemoveCart)
 	router.POST(baseURL+"/api/cart/:id", wrapper.AddCart)
 	router.PUT(baseURL+"/api/close/:userId/:id", wrapper.ClosePost)
+	router.GET(baseURL+"/api/favorite", wrapper.GetFavorite)
+	router.DELETE(baseURL+"/api/favorite/:id", wrapper.RemoveFavorite)
+	router.POST(baseURL+"/api/favorite/:id", wrapper.AddFavorite)
 	router.POST(baseURL+"/api/post", wrapper.CreatePost)
 	router.GET(baseURL+"/api/post/close/user/:idUser/:page", wrapper.FindClosePostByUserID)
 	router.GET(baseURL+"/api/post/open/user/:idUser/:page", wrapper.FindOpenPostByUserID)
@@ -333,32 +392,33 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
