@@ -39,3 +39,19 @@ func NewCloseHandler(
 ) CloseHandler {
 	return CloseHandler{postRepo: postRepo, validator: validator, loger: loger}
 }
+
+func NewAddCartHandler(
+	cartRepo domain.CUDCartRepository,
+	validator domain.SpecificationManager,
+	loger *logrus.Entry,
+) AddCartHandler {
+	return AddCartHandler{cartRepo: cartRepo, validator: validator, loger: loger}
+}
+
+func NewRemoveCartHandler(
+	cartRepo domain.CUDCartRepository,
+	validator domain.SpecificationManager,
+	loger *logrus.Entry,
+) RemoveCartHandler {
+	return RemoveCartHandler{cartRepo: cartRepo, validator: validator, loger: loger}
+}

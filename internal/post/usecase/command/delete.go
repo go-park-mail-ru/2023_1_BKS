@@ -21,3 +21,18 @@ func (h *DeleteHandler) Handle(
 	err := h.postRepo.Delete(ctx, id)
 	return err
 }
+
+type RemoveCartHandler struct {
+	cartRepo  domain.CUDCartRepository
+	validator domain.SpecificationManager
+	loger     *logrus.Entry
+}
+
+func (h *RemoveCartHandler) Handle(
+	ctx context.Context,
+	userId uuid.UUID,
+	postId uuid.UUID,
+) error {
+	err := h.cartRepo.Remove(ctx, userId, postId)
+	return err
+}

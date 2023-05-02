@@ -20,3 +20,12 @@ type RRepository interface {
 	GetByTag(ctx context.Context, tag string, number int) ([]Post, error)
 	GetSortNew(ctx context.Context, number int) ([]Post, error)
 }
+
+type CUDCartRepository interface {
+	Add(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error
+	Remove(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error
+}
+
+type RCartRepository interface {
+	Get(ctx context.Context, userId uuid.UUID) ([]string, error)
+}

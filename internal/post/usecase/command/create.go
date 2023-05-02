@@ -33,3 +33,18 @@ func (h *CreateHandler) Handle(
 	err := h.postRepo.Create(ctx, post)
 	return err
 }
+
+type AddCartHandler struct {
+	cartRepo  domain.CUDCartRepository
+	validator domain.SpecificationManager
+	loger     *logrus.Entry
+}
+
+func (h *AddCartHandler) Handle(
+	ctx context.Context,
+	userId uuid.UUID,
+	postId uuid.UUID,
+) error {
+	err := h.cartRepo.Add(ctx, userId, postId)
+	return err
+}

@@ -3,11 +3,14 @@ module post
 go 1.18
 
 require (
+	github.com/bradfitz/gomemcache v0.0.0-20230124162541-5f7a7d875746
 	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/getkin/kin-openapi v0.107.0
+	github.com/gomodule/redigo v1.8.9
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/labstack/echo/v4 v4.9.1
+	github.com/lib/pq v1.10.2
 	github.com/sirupsen/logrus v1.9.0
 )
 
@@ -18,12 +21,10 @@ require (
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
-	github.com/lib/pq v1.10.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect

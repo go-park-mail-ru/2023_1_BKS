@@ -40,3 +40,10 @@ func NewGetByTagHandler(
 ) GetTagHandler {
 	return GetTagHandler{postRepo: postRepo, loger: loger}
 }
+
+func NewGetCartHandler(
+	cartRepo domain.RCartRepository,
+	loger *logrus.Entry,
+) GetCartHandler {
+	return GetCartHandler{cartRepo: cartRepo, loger: loger}
+}

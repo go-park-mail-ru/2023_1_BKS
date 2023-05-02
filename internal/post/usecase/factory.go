@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"post/config"
 	"post/domain"
 	"post/repository"
@@ -13,13 +12,11 @@ import (
 )
 
 func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
-	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%d sslmode=%s",
-		cfg.Db.User, cfg.Db.DataBaseName, cfg.Db.Password, cfg.Db.Host,
-		cfg.Db.Port, cfg.Db.Sslmode)
-
 	validator := domain.CreateSpecificationManager(cfg)
 
-	postRepository := repository.CreatePostgressRepository(dsn)
+	cartRepository := repository.CreateRedisRepository(cfg)
+	postRepository := repository.CreatePostgressRepository(cfg)
+
 	logger := logrus.NewEntry(logrus.StandardLogger())
 
 	return Commands{
@@ -27,6 +24,8 @@ func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 			UpdatePost: command.NewUpdateHandler(&postRepository, validator, logger),
 			DeletePost: command.NewDeleteHandler(&postRepository, validator, logger),
 			ClosePost:  command.NewCloseHandler(&postRepository, validator, logger),
+			AddCart:    command.NewAddCartHandler(&cartRepository, validator, logger),
+			RemoveCart: command.NewRemoveCartHandler(&cartRepository, validator, logger),
 		},
 		Queries{
 			GetIdPost:          query.NewGetIdHandler(postRepository, logger),
@@ -34,5 +33,6 @@ func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 			GetUserIdOpenPost:  query.NewGetByUserIdOpenHandler(postRepository, logger),
 			GetUserIdClosePost: query.NewGetByUserIdCloseHandler(postRepository, logger),
 			GetTagPost:         query.NewGetByTagHandler(postRepository, logger),
+			GetCart:            query.NewGetCartHandler(&cartRepository, logger),
 		}
 }

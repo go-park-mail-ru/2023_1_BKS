@@ -70,3 +70,15 @@ func (h GetTagHandler) Handle(
 ) ([]domain.Post, error) {
 	return h.postRepo.GetByTag(ctx, tag, number)
 }
+
+type GetCartHandler struct {
+	cartRepo domain.RCartRepository
+	loger    *logrus.Entry
+}
+
+func (h GetCartHandler) Handle(
+	ctx context.Context,
+	userId uuid.UUID,
+) ([]string, error) {
+	return h.cartRepo.Get(ctx, userId)
+}
