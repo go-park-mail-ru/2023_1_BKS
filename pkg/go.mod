@@ -3,17 +3,26 @@ module pkg
 go 1.18
 
 require (
+	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/getkin/kin-openapi v0.107.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang/protobuf v1.5.2
+	github.com/labstack/echo/v4 v4.10.2
 	github.com/lestrrat-go/jwx v1.2.25
+	google.golang.org/grpc v1.51.0
+	google.golang.org/protobuf v1.28.1
 )
 
 require (
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
-	github.com/go-openapi/swag v0.19.5 // indirect
-	github.com/goccy/go-json v0.9.7 // indirect
+	github.com/go-openapi/swag v0.21.1 // indirect
+	github.com/goccy/go-json v0.9.11 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.0 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
