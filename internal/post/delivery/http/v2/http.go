@@ -314,9 +314,27 @@ func (a HttpServer) GetCart(ctx echo.Context) error {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	resultDTO, err := a.query.GetCart.Handle(context.Background(), userId)
+	resultUUID, err := a.query.GetCart.Handle(context.Background(), userId)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	resultDTO, err := a.query.GetByArray.Handle(context.Background(), resultUUID)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	var result []MiniPost
+	for _, post := range resultDTO {
+		p := MiniPost{
+			PostId:     post.Id.String(),
+			PathImages: post.PathImages,
+			Price:      post.Price,
+			Title:      post.Title,
+			UserId:     post.UserID.String(),
+			Views:      post.Views,
+		}
+		result = append(result, p)
 	}
 
 	return ctx.JSON(http.StatusOK, resultDTO)
@@ -374,16 +392,34 @@ func (a HttpServer) GetFavorite(ctx echo.Context) error {
 
 	headerAuth := ctx.Request().Header.Get("Authorization")
 	user := jwt.ClaimParse(headerAuth, "id")
-
+	fmt.Println(user)
 	userId, err := uuid.Parse(user)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	resultDTO, err := a.query.GetFavorite.Handle(context.Background(), userId)
+	resultUUID, err := a.query.GetFavorite.Handle(context.Background(), userId)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}
 
-	return ctx.JSON(http.StatusOK, resultDTO)
+	resultDTO, err := a.query.GetByArray.Handle(context.Background(), resultUUID)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	var result []MiniPost
+	for _, post := range resultDTO {
+		p := MiniPost{
+			PostId:     post.Id.String(),
+			PathImages: post.PathImages,
+			Price:      post.Price,
+			Title:      post.Title,
+			UserId:     post.UserID.String(),
+			Views:      post.Views,
+		}
+		result = append(result, p)
+	}
+	fmt.Println(result)
+	return ctx.JSON(http.StatusOK, result)
 }

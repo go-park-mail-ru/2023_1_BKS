@@ -27,11 +27,20 @@ func (r *CartRedisRepository) Remove(ctx context.Context, userId uuid.UUID, post
 	return nil
 }
 
-func (r *CartRedisRepository) Get(ctx context.Context, userId uuid.UUID) ([]string, error) {
+func (r *CartRedisRepository) Get(ctx context.Context, userId uuid.UUID) ([]uuid.UUID, error) {
 	values, err := redis.Strings(r.cart.Do("smembers", userId.String()))
 	if err != nil {
-		return []string{}, err
+		return []uuid.UUID{}, err
 	}
 
-	return values, nil
+	var result []uuid.UUID
+	for _, val := range values {
+		postId, err := uuid.Parse(val)
+		if err != nil {
+			return []uuid.UUID{}, err
+		}
+		result = append(result, postId)
+	}
+
+	return result, nil
 }

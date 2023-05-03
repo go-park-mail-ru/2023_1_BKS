@@ -12,7 +12,7 @@ CREATE TABLE posts (
 );
 
 CREATE TABLE favorite (
-    IdPost uuid PRIMARY KEY,
-    UserId uuid NOT NULL,
+    IdPost uuid[] NOT NULL,
+    UserId uuid PRIMARY KEY
 );
 

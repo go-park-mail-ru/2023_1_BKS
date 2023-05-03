@@ -128,6 +128,55 @@ func (t PostPostgressRepository) GetByUserIdClose(ctx context.Context, idUser uu
 	return posts, err
 }
 
+func (t PostPostgressRepository) GetFavorite(ctx context.Context, userId uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := t.posts.Query(`SELECT idpost FROM favorite WHERE userid = $1`, userId)
+	if err != nil {
+		return []uuid.UUID{}, err
+	}
+
+	var postId []uuid.UUID
+
+	for rows.Next() {
+		p := uuid.UUID{}
+		err = rows.Scan(pq.Array(&postId))
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		q := uuid.UUID{}
+		if p != q {
+			postId = append(postId, p)
+		}
+	}
+
+	if err != nil {
+		return []uuid.UUID{}, err
+	}
+
+	return postId, err
+}
+
+func (t PostPostgressRepository) GetByArray(ctx context.Context, postId []uuid.UUID) ([]domain.Post, error) {
+	var posts []domain.Post
+
+	for _, idp := range postId {
+		fmt.Println(idp)
+		row := t.posts.QueryRow(`SELECT id, userid, title, description,
+		price,  tags, images, time FROM posts WHERE close = false and id = $1`, idp)
+		fmt.Println(row)
+		p := domain.Post{}
+		err := row.Scan(&p.Id, &p.UserID, &p.Title, &p.Desciption,
+			&p.Price, &p.Tags, pq.Array(&p.PathImages), &p.Time)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		fmt.Println(p)
+		posts = append(posts, p)
+	}
+	return posts, nil
+}
+
 func (t PostPostgressRepository) GetSortNew(ctx context.Context, number int) ([]domain.Post, error) {
 	if number <= 0 {
 		return []domain.Post{}, nil // Ошибка страницы
@@ -175,5 +224,28 @@ func (t *PostPostgressRepository) Delete(ctx context.Context, id uuid.UUID) erro
 
 func (t *PostPostgressRepository) Close(ctx context.Context, id uuid.UUID) error {
 	_, err := t.posts.Exec("update posts set close = true where id = $1", id)
+	return err
+}
+
+func (t *PostPostgressRepository) AddFavorite(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error {
+	pid, _ := t.GetFavorite(ctx, userId)
+
+	pid = append(pid, postId)
+	fmt.Println(pid)
+	_, err := t.posts.Exec("insert into favorite (idpost, userid) values ($1, $2)",
+		pq.Array(pid), userId)
+	return err
+}
+
+func (t *PostPostgressRepository) RemoveFavorite(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error {
+	pid, _ := t.GetFavorite(ctx, userId)
+	var pidClear []uuid.UUID
+	for _, fpid := range pid {
+		if fpid != postId {
+			pidClear = append(pidClear, fpid)
+		}
+	}
+
+	_, err := t.posts.Exec("update favorite set idpost = $1 where UserId = $2", pq.Array(pidClear), userId)
 	return err
 }

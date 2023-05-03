@@ -55,3 +55,19 @@ func NewRemoveCartHandler(
 ) RemoveCartHandler {
 	return RemoveCartHandler{cartRepo: cartRepo, validator: validator, loger: loger}
 }
+
+func NewAddFavoriteHandler(
+	postRepo domain.CUDRepository,
+	validator domain.SpecificationManager,
+	loger *logrus.Entry,
+) AddFavoriteHandler {
+	return AddFavoriteHandler{postRepo: postRepo, validator: validator, loger: loger}
+}
+
+func NewRemoveFavoriteHandler(
+	postRepo domain.CUDRepository,
+	validator domain.SpecificationManager,
+	loger *logrus.Entry,
+) RemoveFavoriteHandler {
+	return RemoveFavoriteHandler{postRepo: postRepo, validator: validator, loger: loger}
+}

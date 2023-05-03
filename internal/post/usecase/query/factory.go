@@ -47,3 +47,17 @@ func NewGetCartHandler(
 ) GetCartHandler {
 	return GetCartHandler{cartRepo: cartRepo, loger: loger}
 }
+
+func NewGetFavoriteHandler(
+	postRepo domain.RRepository,
+	loger *logrus.Entry,
+) GetFavoriteHandler {
+	return GetFavoriteHandler{postRepo: postRepo, loger: loger}
+}
+
+func NewGetByArrayHandler(
+	postRepo domain.RRepository,
+	loger *logrus.Entry,
+) GetByArrayHandler {
+	return GetByArrayHandler{postRepo: postRepo, loger: loger}
+}

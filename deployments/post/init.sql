@@ -10,3 +10,9 @@ CREATE TABLE posts (
     "time" timestamp NOT NULL,
     Views integer
 );
+
+CREATE TABLE favorite (
+    IdPost uuid[],
+    UserId uuid PRIMARY KEY
+);
+

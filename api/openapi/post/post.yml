@@ -289,15 +289,9 @@ paths:
             application/json:
               schema:
                 type: array
-                description: все объявления.
                 items:
                   oneOf:
-                    - required:
-                      - id
-                      properties:
-                        id:
-                          type: string
-                          description: ID пользователя.
+                    - $ref: '#/components/schemas/MiniPost'
         default:
           description: Произошла ошибка.
           content:
@@ -363,15 +357,9 @@ paths:
             application/json:
               schema:
                 type: array
-                description: все объявления.
                 items:
                   oneOf:
-                    - required:
-                      - id
-                      properties:
-                        id:
-                          type: string
-                          description: ID пользователя.
+                    - $ref: '#/components/schemas/MiniPost'
         default:
           description: Произошла ошибка.
           content:
@@ -526,6 +514,9 @@ components:
               items:
                 type: string
                 description: Изображение.
+              
+              
+            
 
     ErrorHTTP:
       required:

@@ -11,6 +11,8 @@ type CUDRepository interface {
 	Update(ctx context.Context, post Post) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	Close(ctx context.Context, id uuid.UUID) error
+	AddFavorite(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error
+	RemoveFavorite(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error
 }
 
 type RRepository interface {
@@ -19,6 +21,8 @@ type RRepository interface {
 	GetByUserIdClose(ctx context.Context, idUser uuid.UUID, number int) ([]Post, error)
 	GetByTag(ctx context.Context, tag string, number int) ([]Post, error)
 	GetSortNew(ctx context.Context, number int) ([]Post, error)
+	GetFavorite(ctx context.Context, userId uuid.UUID) ([]uuid.UUID, error)
+	GetByArray(ctx context.Context, postId []uuid.UUID) ([]Post, error)
 }
 
 type CUDCartRepository interface {
@@ -27,5 +31,5 @@ type CUDCartRepository interface {
 }
 
 type RCartRepository interface {
-	Get(ctx context.Context, userId uuid.UUID) ([]string, error)
+	Get(ctx context.Context, userId uuid.UUID) ([]uuid.UUID, error)
 }

@@ -79,7 +79,7 @@ type GetCartHandler struct {
 func (h GetCartHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
-) ([]string, error) {
+) ([]uuid.UUID, error) {
 	return h.cartRepo.Get(ctx, userId)
 }
 
@@ -91,6 +91,18 @@ type GetFavoriteHandler struct {
 func (h GetFavoriteHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
-) ([]string, error) {
+) ([]uuid.UUID, error) {
 	return h.postRepo.GetFavorite(ctx, userId)
+}
+
+type GetByArrayHandler struct {
+	postRepo domain.RRepository
+	loger    *logrus.Entry
+}
+
+func (h GetByArrayHandler) Handle(
+	ctx context.Context,
+	postId []uuid.UUID,
+) ([]domain.Post, error) {
+	return h.postRepo.GetByArray(ctx, postId)
 }
