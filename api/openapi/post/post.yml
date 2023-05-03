@@ -417,8 +417,6 @@ paths:
     get:
       summary: Поиск.
       operationId: Search
-      security:
-      - bearerAuth: []
       parameters:
           - name: query
             in: query
