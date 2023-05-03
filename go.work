@@ -2,6 +2,8 @@ go 1.18
 
 use ./internal/auth
 
+use ./internal/post
+
 use ./pkg/
 
 use ./
