@@ -423,3 +423,30 @@ func (a HttpServer) GetFavorite(ctx echo.Context) error {
 	fmt.Println(result)
 	return ctx.JSON(http.StatusOK, result)
 }
+
+// ///////////////////////////////////////////////////////////////////////////////////////////
+// Поиск
+// ///////////////////////////////////////////////////////////////////////////////////////////
+
+func (a HttpServer) Search(ctx echo.Context, params SearchParams) error {
+
+	resultDTO, err := a.query.SearhPost.Handle(context.Background(), params.Query)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	var result []MiniPost
+	for _, post := range resultDTO {
+		p := MiniPost{
+			PostId:     post.Id.String(),
+			PathImages: post.PathImages,
+			Price:      post.Price,
+			Title:      post.Title,
+			UserId:     post.UserID.String(),
+			Views:      post.Views,
+		}
+		result = append(result, p)
+	}
+	fmt.Println(result)
+	return ctx.JSON(http.StatusOK, result)
+}

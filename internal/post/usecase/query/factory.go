@@ -61,3 +61,10 @@ func NewGetByArrayHandler(
 ) GetByArrayHandler {
 	return GetByArrayHandler{postRepo: postRepo, loger: loger}
 }
+
+func NewSearchPostHandler(
+	postRepo domain.RRepository,
+	loger *logrus.Entry,
+) SearchPostHandler {
+	return SearchPostHandler{postRepo: postRepo, loger: loger}
+}

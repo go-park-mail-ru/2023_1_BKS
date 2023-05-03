@@ -27,4 +27,5 @@ type Queries struct {
 	GetCart            query.GetCartHandler
 	GetFavorite        query.GetFavoriteHandler
 	GetByArray         query.GetByArrayHandler
+	SearhPost          query.SearchPostHandler
 }

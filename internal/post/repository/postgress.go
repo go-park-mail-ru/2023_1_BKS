@@ -203,6 +203,28 @@ func (t PostPostgressRepository) GetSortNew(ctx context.Context, number int) ([]
 	return posts, err
 }
 
+func (t PostPostgressRepository) Search(ctx context.Context, search string) ([]domain.Post, error) {
+	rows, err := t.posts.Query(`Select id FROM posts WHERE ts_rank(to_tsvector(description), plainto_tsquery($1)) ORDER BY ts_rank(to_tsvector(description), plainto_tsquery($1)`, search)
+	if err != nil {
+		return []domain.Post{}, err
+	}
+
+	var posts []domain.Post
+
+	for rows.Next() {
+		p := domain.Post{}
+		err = rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Desciption,
+			&p.Price, &p.Tags, pq.Array(&p.PathImages), &p.Time)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, err
+}
+
 func (t *PostPostgressRepository) Create(ctx context.Context, post domain.Post) error {
 	_, err := t.posts.Exec("insert into posts (id, userid, title, description, price, close, tags, images, time, views) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 		post.Id, post.UserID, post.Title, post.Desciption, post.Price, post.Close,

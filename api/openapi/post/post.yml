@@ -356,10 +356,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/MiniPost'
+                $ref: '#/components/schemas/MiniPost'
         default:
           description: Произошла ошибка.
           content:
@@ -413,6 +410,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
 
+  /api/search:
+    post:
+      summary: Поиск.
+      operationId: search
+      parameters:
+          - name: query
+            in: query
+            description: Запрос
+            required: true
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Объявление добавленно.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiniPost'
+        default:
+          description: Произошла ошибка.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorHTTP'
 
 components:
   schemas:
@@ -514,9 +535,6 @@ components:
               items:
                 type: string
                 description: Изображение.
-              
-              
-            
 
     ErrorHTTP:
       required:

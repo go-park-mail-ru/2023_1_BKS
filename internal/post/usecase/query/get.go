@@ -106,3 +106,15 @@ func (h GetByArrayHandler) Handle(
 ) ([]domain.Post, error) {
 	return h.postRepo.GetByArray(ctx, postId)
 }
+
+type SearchPostHandler struct {
+	postRepo domain.RRepository
+	loger    *logrus.Entry
+}
+
+func (h SearchPostHandler) Handle(
+	ctx context.Context,
+	search string,
+) ([]domain.Post, error) {
+	return h.postRepo.Search(ctx, search)
+}

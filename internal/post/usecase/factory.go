@@ -38,5 +38,6 @@ func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 			GetCart:            query.NewGetCartHandler(&cartRepository, logger),
 			GetFavorite:        query.NewGetFavoriteHandler(postRepository, logger),
 			GetByArray:         query.NewGetByArrayHandler(postRepository, logger),
+			SearhPost:          query.NewSearchPostHandler(postRepository, logger),
 		}
 }
