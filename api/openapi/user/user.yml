@@ -113,6 +113,74 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
                 
+  #   /api/favorite/{id}:
+  #   post:
+  #     summary: Добавить объявление в избранное по id поста.
+  #     operationId: addFavoritePost
+  #     security:
+  #     - bearerAuth: []
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: ID поста.
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '201':
+  #         description: Объявление добавлено.
+  #       default:
+  #         description: Произошла ошибка.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorHTTP'
+        
+  #   delete:
+  #     summary: Удалить объявление по id поста.
+  #     operationId: removeFavoritePost
+  #     security:
+  #     - bearerAuth: []
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: ID поста.
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '204':
+  #         description: Объявление удалено.
+  #       default:
+  #         description: Произошла ошибка.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorHTTP'
+                
+  # /api/favorite/{page}:
+  #   get:
+  #     summary: Вернуть избранное пользователя.
+  #     operationId: addFavoritePodst
+  #     security:
+  #     - bearerAuth: []
+  #     parameters:
+  #       - name: page
+  #         in: path
+  #         description: страница.
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '201':
+  #         description: Объявление добавлено.
+  #       default:
+  #         description: Произошла ошибка.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorHTTP'
+                
 
 components:
   schemas:

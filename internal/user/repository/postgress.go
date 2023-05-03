@@ -95,7 +95,6 @@ func (t *UserPostgressRepository) Create(ctx context.Context, user domain.User) 
 	_, err := t.users.Exec("insert into users (id, email,  phonenumber, login, password, name, pathtoavatar) values ($1, $2, $3, $4, $5, $6, $7)",
 		user.Id, user.Email, user.PhoneNumber, user.Login, user.Password, user.Name,
 		user.PathToAvatar)
-	// Должен возвращаться или ссесия или jwt токен
 	return err
 }
 
