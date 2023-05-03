@@ -7,5 +7,3 @@ use ./internal/post
 use ./pkg/
 
 use ./
-
-use ./config/post

@@ -1,39 +1,58 @@
 version: "3.9"
 services:
 
-  redis-cart:
-    container_name: "redis_cart"
-    image: redis
-    ports:
-      - "6379:6379"
-    environment:
-      POSTGRES_DB: "post"
-      POSTGRES_USER: "appuniq"
-      POSTGRES_PASSWORD: "uniq123"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U appuniq -d post"]
-      interval: 4s
-      timeout: 3s
-      retries: 5
+  nginx:
+    image: nginx
     volumes:
-      - ./post/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./nginx:/etc/nginx/conf.d
+    ports:
+      - 8080:80
+    depends_on:
+      - auth-service
+      - user-service
+    networks:
+      - appuniq-service
 
-  postgres-post:
-    container_name: "postgres_post"
+  auth-service:
+    container_name: "auth_service"
+    build: ./auth
+    expose:
+      - "8082"
+      - "8085"
+    networks:
+      - appuniq-service
+
+  user-service:
+    container_name: "user_service"
+    build: ./user
+    expose:
+      - "8080"
+      - "8081"
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+    networks:
+      - postgres-user-network
+      - appuniq-service
+
+  postgres-user:
+    container_name: "postgres_user"
     image: postgres
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     environment:
-      POSTGRES_DB: "post"
+      POSTGRES_DB: "user"
       POSTGRES_USER: "appuniq"
       POSTGRES_PASSWORD: "uniq123"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U appuniq -d post"]
-      interval: 4s
-      timeout: 3s
-      retries: 5
+        test: ["CMD-SHELL", "pg_isready -U appuniq -d user"]
+        interval: 4s
+        timeout: 3s
+        retries: 5
     volumes:
-      - ./post/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./user/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - postgres-user-network
   
   # postgres-post:
   #   container_name: "postgres_post"
@@ -54,3 +73,14 @@ services:
   #   networks:
   #     - postgres-post-network
 
+
+networks:
+  appuniq-service:
+    name: appuniq-service
+    driver: bridge  
+  postgres-user-network:
+    name: postgres-user-network
+    driver: bridge
+  # postgres-post-network:
+  #   name: postgres-post-network
+  #   driver: bridge
