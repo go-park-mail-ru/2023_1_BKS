@@ -115,6 +115,6 @@ type SearchPostHandler struct {
 func (h SearchPostHandler) Handle(
 	ctx context.Context,
 	search string,
-) ([]domain.Post, error) {
+) ([]uuid.UUID, error) {
 	return h.postRepo.Search(ctx, search)
 }

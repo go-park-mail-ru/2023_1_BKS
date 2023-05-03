@@ -430,7 +430,12 @@ func (a HttpServer) GetFavorite(ctx echo.Context) error {
 
 func (a HttpServer) Search(ctx echo.Context, params SearchParams) error {
 
-	resultDTO, err := a.query.SearhPost.Handle(context.Background(), params.Query)
+	resultDTOUuid, err := a.query.SearhPost.Handle(context.Background(), params.Query)
+	if err != nil {
+		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	}
+
+	resultDTO, err := a.query.GetByArray.Handle(context.Background(), resultDTOUuid)
 	if err != nil {
 		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
 	}

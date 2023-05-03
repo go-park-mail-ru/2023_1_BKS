@@ -8,8 +8,10 @@ CREATE TABLE posts (
     Tags   text NOT NULL,
     Images text[] NOT NULL,
     "time" timestamp NOT NULL,
-    Views integer
+    Views integer,
+    fts   TSVECTOR
 );
+
 
 CREATE TABLE favorite (
     IdPost uuid[],

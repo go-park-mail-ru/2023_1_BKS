@@ -203,18 +203,19 @@ func (t PostPostgressRepository) GetSortNew(ctx context.Context, number int) ([]
 	return posts, err
 }
 
-func (t PostPostgressRepository) Search(ctx context.Context, search string) ([]domain.Post, error) {
-	rows, err := t.posts.Query(`Select id FROM posts WHERE ts_rank(to_tsvector(description), plainto_tsquery($1)) ORDER BY ts_rank(to_tsvector(description), plainto_tsquery($1)`, search)
+func (t PostPostgressRepository) Search(ctx context.Context, search string) ([]uuid.UUID, error) {
+	_, err := t.posts.Exec("UPDATE posts SET fts = setweight(to_tsvector(title), 'A') || setweight(to_tsvector(description), 'B')")
+	fmt.Println(search)
+	rows, err := t.posts.Query(`Select id FROM posts WHERE fts @@ to_tsquery($1)`, search)
 	if err != nil {
-		return []domain.Post{}, err
+		return []uuid.UUID{}, err
 	}
 
-	var posts []domain.Post
+	var posts []uuid.UUID
 
 	for rows.Next() {
-		p := domain.Post{}
-		err = rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Desciption,
-			&p.Price, &p.Tags, pq.Array(&p.PathImages), &p.Time)
+		p := uuid.UUID{}
+		err = rows.Scan(&p)
 		if err != nil {
 			fmt.Println(err)
 			continue

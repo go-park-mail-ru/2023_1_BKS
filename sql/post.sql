@@ -9,6 +9,7 @@ CREATE TABLE posts (
     Images text[] NOT NULL,
     "time" timestamp NOT NULL,
     Views integer,
+    fts   TSVECTOR
 );
 
 CREATE TABLE favorite (

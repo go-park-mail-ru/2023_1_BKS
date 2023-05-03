@@ -23,7 +23,7 @@ type RRepository interface {
 	GetSortNew(ctx context.Context, number int) ([]Post, error)
 	GetFavorite(ctx context.Context, userId uuid.UUID) ([]uuid.UUID, error)
 	GetByArray(ctx context.Context, postId []uuid.UUID) ([]Post, error)
-	Search(ctx context.Context, search string) ([]Post, error)
+	Search(ctx context.Context, search string) ([]uuid.UUID, error)
 }
 
 type CUDCartRepository interface {
