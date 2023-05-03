@@ -19,7 +19,6 @@ func (h *UpdateHandler) Handle(
 	id uuid.UUID,
 	postDelivery domain.Post,
 ) error {
-	//Тут должна быть валидация
 	post := domain.Post{
 		Id:         id,
 		UserID:     postDelivery.UserID,
