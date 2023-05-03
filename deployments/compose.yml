@@ -3,6 +3,7 @@ services:
 
   nginx:
     image: nginx
+    build: ./nginx
     volumes:
       - ./nginx:/etc/nginx/conf.d
     ports:
