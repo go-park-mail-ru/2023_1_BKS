@@ -54,7 +54,7 @@ func (e TitleLengthValidation) IsValid(title string) error {
 	if e.minLength < uint(len(title)) && e.maxLength < uint(len(title)) {
 		return TitleMaxLengthErr{e.maxLength}
 	}
-	if e.minLength < uint(len(title)) && e.maxLength < uint(len(title)) {
+	if e.minLength > uint(len(title)) && e.maxLength > uint(len(title)) {
 		return TitleMinLengthErr{e.minLength}
 	}
 	return nil
@@ -95,7 +95,7 @@ func (e DescriptionLengthValidation) IsValid(desc string) error {
 	if e.minLength <= uint(len(desc)) && e.maxLength <= uint(len(desc)) {
 		return DescriptionMaxLengthErr{e.maxLength}
 	}
-	if e.minLength <= uint(len(desc)) && e.maxLength <= uint(len(desc)) {
+	if e.minLength >= uint(len(desc)) && e.maxLength >= uint(len(desc)) {
 		return DescriptionMinLengthErr{e.minLength}
 	}
 	return nil
@@ -183,7 +183,7 @@ func (e TagsLengthValidation) IsValid(tags string) error {
 	if e.minLength <= uint(len(tags)) && e.maxLength <= uint(len(tags)) {
 		return DescriptionMaxLengthErr{e.maxLength}
 	}
-	if e.minLength <= uint(len(tags)) && e.maxLength <= uint(len(tags)) {
+	if e.minLength >= uint(len(tags)) && e.maxLength >= uint(len(tags)) {
 		return DescriptionMinLengthErr{e.minLength}
 	}
 	return nil

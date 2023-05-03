@@ -87,19 +87,7 @@ func Run() {
 	server := grpc.NewServer()
 
 	e := echo.New()
-	/*
-		fa, err := authmiddlevare.NewInstanceAuthenticator()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
-			os.Exit(1)
-		}
 
-		mw, err := authmiddlevare.CreateMiddleware(fa, swagger, "AppUniqFrontend", "AppUniqUser")
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
-			os.Exit(1)
-		}
-	*/
 	e.Use(middleware.Logger())
 	e.Use(oapimiddleware.OapiRequestValidator(swagger))
 

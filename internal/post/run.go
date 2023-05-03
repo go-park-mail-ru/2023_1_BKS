@@ -42,24 +42,6 @@ func AsyncRunHTTP(e *echo.Echo, cfg config.Config) error {
 	return e.Shutdown(ctx)
 }
 
-// func AsyncRunGrpc(server *grpc.Server, lis net.Listener, cfg config.Config) error {
-// 	go func() {
-// 		err := server.Serve(lis)
-// 		if err != nil {
-// 			fmt.Fprintf(os.Stderr, "Ошибка загрузки сервера grpc\n: %s", err)
-// 			os.Exit(1)
-// 		}
-// 	}()
-
-// 	interrupt := make(chan os.Signal, 1)
-// 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
-// 	<-interrupt
-
-// 	server.GracefulStop()
-
-// 	return nil
-// }
-
 func Run(cfg config.Config) {
 
 	ctx := context.Background()

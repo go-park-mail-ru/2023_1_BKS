@@ -19,7 +19,6 @@ func (h *CreateHandler) Handle(
 	ctx context.Context,
 	postDelivery domain.Post,
 ) error {
-	//Тут должна быть валидация
 	post := domain.Post{
 		Id:         uuid.New(),
 		UserID:     postDelivery.UserID,
