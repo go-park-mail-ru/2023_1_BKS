@@ -54,8 +54,6 @@ func Authenticate(v JWSValidator, ctx context.Context,
 func GetJWSFromRequest(req *http.Request) (string, error) {
 	authHdr := req.Header.Get("Authorization")
 
-	fmt.Println(authHdr)
-
 	if authHdr == "" {
 		return "", ErrNoAuthHeader
 	}
