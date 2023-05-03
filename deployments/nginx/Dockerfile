@@ -4,7 +4,7 @@ RUN apk add git
 WORKDIR /node/src/
 RUN git clone https://github.com/frontend-park-mail-ru/2023-1_Yula
 WORKDIR /node/src/2023-1_Yula
-RUN git checkout dz7
+RUN git checkout dev
 RUN npm i
 RUN npm run build-dev
 
