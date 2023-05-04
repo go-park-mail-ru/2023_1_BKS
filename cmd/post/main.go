@@ -1,8 +1,8 @@
 package main
 
 import (
-	"post"
-	"post/config"
+	config "github.com/go-park-mail-ru/2023_1_BKS/config/post"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post"
 )
 
 func main() {

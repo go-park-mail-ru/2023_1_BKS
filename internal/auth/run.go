@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	serverGrpc "auth/delivery/grpc"
+	serverGrpc "github.com/go-park-mail-ru/2023_1_BKS/internal/auth/delivery/grpc"
 
 	oapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/labstack/echo/v4"
@@ -18,8 +18,9 @@ import (
 	"github.com/labstack/gommon/log"
 	"google.golang.org/grpc"
 
-	v2 "auth/delivery/http/v2"
-	"auth/usecase"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/auth/usecase"
+
+	v2 "github.com/go-park-mail-ru/2023_1_BKS/internal/auth/delivery/http"
 )
 
 func AsyncRunHTTP(e *echo.Echo) error {

@@ -6,17 +6,19 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"post/config"
-	"post/usecase"
 	"syscall"
 	"time"
 
-	authmiddlevare "pkg/middleware"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/usecase"
+
+	config "github.com/go-park-mail-ru/2023_1_BKS/config/post"
+
+	authmiddlevare "github.com/go-park-mail-ru/2023_1_BKS/pkg/middleware"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	v2 "post/delivery/http/v2"
+	v2 "github.com/go-park-mail-ru/2023_1_BKS/internal/post/delivery/http"
 )
 
 func AsyncRunHTTP(e *echo.Echo, cfg config.Config) error {

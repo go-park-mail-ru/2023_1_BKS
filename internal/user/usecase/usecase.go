@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"user/usecase/command"
-	"user/usecase/query"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/usecase/command"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/usecase/query"
 )
 
 // В данном агрегате перечисленны все команды сервиса пользователя

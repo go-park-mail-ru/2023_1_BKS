@@ -1,8 +1,9 @@
 package main
 
 import (
-	config "config/user"
-	"user"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user"
+
+	config "github.com/go-park-mail-ru/2023_1_BKS/config/user"
 )
 
 func main() {

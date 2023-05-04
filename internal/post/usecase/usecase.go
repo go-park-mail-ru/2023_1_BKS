@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"post/usecase/command"
-	"post/usecase/query"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/usecase/command"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/usecase/query"
 )
 
 // В данном агрегате перечисленны все команды сервиса объявлений

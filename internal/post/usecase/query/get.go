@@ -2,7 +2,8 @@ package query
 
 import (
 	"context"
-	"post/domain"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/domain"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"

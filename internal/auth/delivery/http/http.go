@@ -1,13 +1,14 @@
 package v2
 
 import (
-	app "auth/usecase"
 	"context"
 	"fmt"
 	"log"
 	"net/http"
 
-	servGrpc "pkg/grpc/user"
+	app "github.com/go-park-mail-ru/2023_1_BKS/internal/auth/usecase"
+
+	servGrpc "github.com/go-park-mail-ru/2023_1_BKS/pkg/grpc/user"
 
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc"

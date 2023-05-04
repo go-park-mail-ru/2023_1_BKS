@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"context"
-	"post/config"
-	"post/domain"
-	"post/repository"
-	"post/usecase/command"
-	"post/usecase/query"
+
+	config "github.com/go-park-mail-ru/2023_1_BKS/config/post"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/domain"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/repository"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/usecase/command"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/usecase/query"
 
 	"github.com/sirupsen/logrus"
 )

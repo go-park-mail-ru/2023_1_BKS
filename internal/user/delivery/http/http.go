@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	servGrpc "pkg/grpc/auth"
-	"pkg/jwt"
-	"user/domain"
-	app "user/usecase"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/domain"
+	app "github.com/go-park-mail-ru/2023_1_BKS/internal/user/usecase"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/pkg/jwt"
+
+	servGrpc "github.com/go-park-mail-ru/2023_1_BKS/pkg/grpc/auth"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"

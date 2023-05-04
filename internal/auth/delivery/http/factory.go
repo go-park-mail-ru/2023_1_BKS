@@ -1,6 +1,6 @@
 package v2
 
-import app "post/usecase"
+import app "github.com/go-park-mail-ru/2023_1_BKS/internal/auth/usecase"
 
 func CreateHttpServer(command app.Commands, query app.Queries) HttpServer {
 	return HttpServer{

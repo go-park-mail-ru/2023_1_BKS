@@ -1,8 +1,9 @@
 package usecase
 
 import (
-	"auth/usecase/commands"
 	"context"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/auth/usecase/commands"
 
 	"github.com/deepmap/oapi-codegen/pkg/ecdsafile"
 	"github.com/lestrrat-go/jwx/jwa"

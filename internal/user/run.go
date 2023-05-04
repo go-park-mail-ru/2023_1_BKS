@@ -1,7 +1,6 @@
 package user
 
 import (
-	config "config/user"
 	"context"
 	"fmt"
 	"net"
@@ -11,16 +10,18 @@ import (
 	"syscall"
 	"time"
 
+	config "github.com/go-park-mail-ru/2023_1_BKS/config/user"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 
 	"google.golang.org/grpc"
 
-	authmiddlevare "pkg/middleware"
-	serverGrpc "user/delivery/grpc"
-	v2 "user/delivery/http/v2"
-	"user/usecase"
+	serverGrpc "github.com/go-park-mail-ru/2023_1_BKS/internal/user/delivery/grpc"
+	v2 "github.com/go-park-mail-ru/2023_1_BKS/internal/user/delivery/http"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/usecase"
+	authmiddlevare "github.com/go-park-mail-ru/2023_1_BKS/pkg/middleware"
 )
 
 func AsyncRunHTTP(e *echo.Echo, cfg config.Config) error {

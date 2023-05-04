@@ -1,7 +1,7 @@
 package query
 
 import (
-	"post/domain"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/domain"
 
 	"github.com/sirupsen/logrus"
 )

@@ -1,6 +1,6 @@
 package domain
 
-import "post/config"
+import config "github.com/go-park-mail-ru/2023_1_BKS/config/post"
 
 func CreateSpecificationManager(cfg config.Config) SpecificationManager {
 	return SpecificationManager{

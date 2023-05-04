@@ -2,7 +2,8 @@ package command
 
 import (
 	"context"
-	"user/domain"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/domain"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"

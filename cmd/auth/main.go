@@ -1,6 +1,6 @@
 package main
 
-import "auth"
+import "github.com/go-park-mail-ru/2023_1_BKS/internal/auth"
 
 func main() {
 

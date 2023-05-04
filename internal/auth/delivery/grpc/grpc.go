@@ -1,9 +1,10 @@
 package delivery
 
 import (
-	app "auth/usecase"
 	context "context"
 	"fmt"
+
+	app "github.com/go-park-mail-ru/2023_1_BKS/internal/auth/usecase"
 )
 
 type GrpcServer struct {

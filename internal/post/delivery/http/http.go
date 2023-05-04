@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"pkg/jwt"
-	"post/domain"
-	app "post/usecase"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/domain"
+
+	app "github.com/go-park-mail-ru/2023_1_BKS/internal/post/usecase"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/pkg/jwt"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"

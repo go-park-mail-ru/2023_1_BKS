@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"post/domain"
 	"time"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/domain"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"

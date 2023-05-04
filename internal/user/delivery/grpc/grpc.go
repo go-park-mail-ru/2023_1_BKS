@@ -2,7 +2,8 @@ package delivery
 
 import (
 	context "context"
-	app "user/usecase"
+
+	app "github.com/go-park-mail-ru/2023_1_BKS/internal/user/usecase"
 )
 
 type GrpcServer struct {

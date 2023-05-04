@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"post/config"
 
+	config "github.com/go-park-mail-ru/2023_1_BKS/config/post"
 	"github.com/gomodule/redigo/redis"
 	_ "github.com/jackc/pgx/stdlib"
 )

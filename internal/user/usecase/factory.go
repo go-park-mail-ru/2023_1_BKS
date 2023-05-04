@@ -1,13 +1,15 @@
 package usecase
 
 import (
-	config "config/user"
 	"context"
 	"fmt"
-	"user/domain"
-	"user/repository"
-	"user/usecase/command"
-	"user/usecase/query"
+
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/domain"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/repository"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/usecase/command"
+	"github.com/go-park-mail-ru/2023_1_BKS/internal/user/usecase/query"
+
+	config "github.com/go-park-mail-ru/2023_1_BKS/config/user"
 
 	"github.com/sirupsen/logrus"
 )
