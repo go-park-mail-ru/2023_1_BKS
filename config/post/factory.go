@@ -22,7 +22,7 @@ func CreateDataBaseConfig() DataBaseConfig {
 		User:         "appuniq",
 		DataBaseName: "post",
 		Password:     "uniq123",
-		Host:         "localhost",
+		Host:         "postgres_post",
 		Port:         5432,
 		Sslmode:      "disable",
 	}

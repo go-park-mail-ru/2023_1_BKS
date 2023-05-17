@@ -12,8 +12,11 @@ CREATE TABLE posts (
     fts   TSVECTOR
 );
 
+
 CREATE TABLE favorite (
-    IdPost uuid[] NOT NULL,
+    IdPost uuid[],
     UserId uuid PRIMARY KEY
 );
+
+
 
