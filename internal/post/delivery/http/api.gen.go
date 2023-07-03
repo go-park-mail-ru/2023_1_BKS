@@ -21,53 +21,41 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Вернуть объявления из корзины.
-	// (GET /api/cart)
+	// (GET /api/v1/cart)
 	GetCart(ctx echo.Context) error
 	// Удалить из корзины товар.
-	// (DELETE /api/cart/{id})
+	// (DELETE /api/v1/cart/{id})
 	RemoveCart(ctx echo.Context, id string) error
 	// Добавить в корзину.
-	// (POST /api/cart/{id})
+	// (POST /api/v1/cart/{id})
 	AddCart(ctx echo.Context, id string) error
-	// Закрыть объявление.
-	// (PUT /api/close/{userId}/{id})
-	ClosePost(ctx echo.Context, userId string, id string) error
 	// Вернуть избранное.
-	// (GET /api/favorite)
+	// (GET /api/v1/favorite)
 	GetFavorite(ctx echo.Context) error
 	// Удалить из избранных товар.
-	// (DELETE /api/favorite/{id})
+	// (DELETE /api/v1/favorite/{id})
 	RemoveFavorite(ctx echo.Context, id string) error
 	// Добавить в избранное.
-	// (POST /api/favorite/{id})
+	// (POST /api/v1/favorite/{id})
 	AddFavorite(ctx echo.Context, id string) error
+	// Возврат массива постов.
+	// (GET /api/v1/post)
+	GetMiniPost(ctx echo.Context, params GetMiniPostParams) error
 	// Создать новое объявление.
-	// (POST /api/post)
+	// (POST /api/v1/post)
 	CreatePost(ctx echo.Context) error
-	// Вернуть закрытые объявления по id пользователя.
-	// (GET /api/post/close/user/{idUser}/{page})
-	FindClosePostByUserID(ctx echo.Context, idUser string, page int) error
-	// Вернуть открытые объявления по id пользователя.
-	// (GET /api/post/open/user/{idUser}/{page})
-	FindOpenPostByUserID(ctx echo.Context, idUser string, page int) error
 	// Удалить объявление.
-	// (DELETE /api/post/{id})
+	// (DELETE /api/v1/post/{id})
 	DeletePost(ctx echo.Context, id string) error
 	// Вернуть объявление по id.
-	// (GET /api/post/{id})
+	// (GET /api/v1/post/{id})
 	FindPostByID(ctx echo.Context, id string) error
 	// Обновить объявление.
-	// (PUT /api/post/{id})
+	// (PUT /api/v1/post/{id})
 	UpdatePost(ctx echo.Context, id string) error
-	// Вернуть объявления по тегу.
-	// (GET /api/post/{tag}/{page})
-	FindPostByTag(ctx echo.Context, tag string, page int) error
 	// Поиск.
-	// (POST /api/search)
+	// (POST /api/v1/search)
 	Search(ctx echo.Context, params SearchParams) error
-	// Основнвая страница
-	// (GET /api/sort/new/{page})
-	GetAllPost(ctx echo.Context, page int) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -122,32 +110,6 @@ func (w *ServerInterfaceWrapper) AddCart(ctx echo.Context) error {
 	return err
 }
 
-// ClosePost converts echo context to params.
-func (w *ServerInterfaceWrapper) ClosePost(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "userId" -------------
-	var userId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "userId", runtime.ParamLocationPath, ctx.Param("userId"), &userId)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter userId: %s", err))
-	}
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
-	}
-
-	ctx.Set(BearerAuthScopes, []string{""})
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ClosePost(ctx, userId, id)
-	return err
-}
-
 // GetFavorite converts echo context to params.
 func (w *ServerInterfaceWrapper) GetFavorite(ctx echo.Context) error {
 	var err error
@@ -195,6 +157,59 @@ func (w *ServerInterfaceWrapper) AddFavorite(ctx echo.Context) error {
 	return err
 }
 
+// GetMiniPost converts echo context to params.
+func (w *ServerInterfaceWrapper) GetMiniPost(ctx echo.Context) error {
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetMiniPostParams
+	// ------------- Required query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "offset", ctx.QueryParams(), &params.Offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
+	}
+
+	// ------------- Required query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "status", ctx.QueryParams(), &params.Status)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter status: %s", err))
+	}
+
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort", ctx.QueryParams(), &params.Sort)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sort: %s", err))
+	}
+
+	// ------------- Optional query parameter "user" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "user", ctx.QueryParams(), &params.User)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter user: %s", err))
+	}
+
+	// ------------- Optional query parameter "tag" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "tag", ctx.QueryParams(), &params.Tag)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter tag: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetMiniPost(ctx, params)
+	return err
+}
+
 // CreatePost converts echo context to params.
 func (w *ServerInterfaceWrapper) CreatePost(ctx echo.Context) error {
 	var err error
@@ -203,54 +218,6 @@ func (w *ServerInterfaceWrapper) CreatePost(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.CreatePost(ctx)
-	return err
-}
-
-// FindClosePostByUserID converts echo context to params.
-func (w *ServerInterfaceWrapper) FindClosePostByUserID(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "idUser" -------------
-	var idUser string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "idUser", runtime.ParamLocationPath, ctx.Param("idUser"), &idUser)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter idUser: %s", err))
-	}
-
-	// ------------- Path parameter "page" -------------
-	var page int
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "page", runtime.ParamLocationPath, ctx.Param("page"), &page)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.FindClosePostByUserID(ctx, idUser, page)
-	return err
-}
-
-// FindOpenPostByUserID converts echo context to params.
-func (w *ServerInterfaceWrapper) FindOpenPostByUserID(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "idUser" -------------
-	var idUser string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "idUser", runtime.ParamLocationPath, ctx.Param("idUser"), &idUser)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter idUser: %s", err))
-	}
-
-	// ------------- Path parameter "page" -------------
-	var page int
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "page", runtime.ParamLocationPath, ctx.Param("page"), &page)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.FindOpenPostByUserID(ctx, idUser, page)
 	return err
 }
 
@@ -306,30 +273,6 @@ func (w *ServerInterfaceWrapper) UpdatePost(ctx echo.Context) error {
 	return err
 }
 
-// FindPostByTag converts echo context to params.
-func (w *ServerInterfaceWrapper) FindPostByTag(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "tag" -------------
-	var tag string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "tag", runtime.ParamLocationPath, ctx.Param("tag"), &tag)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter tag: %s", err))
-	}
-
-	// ------------- Path parameter "page" -------------
-	var page int
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "page", runtime.ParamLocationPath, ctx.Param("page"), &page)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.FindPostByTag(ctx, tag, page)
-	return err
-}
-
 // Search converts echo context to params.
 func (w *ServerInterfaceWrapper) Search(ctx echo.Context) error {
 	var err error
@@ -345,22 +288,6 @@ func (w *ServerInterfaceWrapper) Search(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.Search(ctx, params)
-	return err
-}
-
-// GetAllPost converts echo context to params.
-func (w *ServerInterfaceWrapper) GetAllPost(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "page" -------------
-	var page int
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "page", runtime.ParamLocationPath, ctx.Param("page"), &page)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.GetAllPost(ctx, page)
 	return err
 }
 
@@ -392,56 +319,53 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.GET(baseURL+"/api/cart", wrapper.GetCart)
-	router.DELETE(baseURL+"/api/cart/:id", wrapper.RemoveCart)
-	router.POST(baseURL+"/api/cart/:id", wrapper.AddCart)
-	router.PUT(baseURL+"/api/close/:userId/:id", wrapper.ClosePost)
-	router.GET(baseURL+"/api/favorite", wrapper.GetFavorite)
-	router.DELETE(baseURL+"/api/favorite/:id", wrapper.RemoveFavorite)
-	router.POST(baseURL+"/api/favorite/:id", wrapper.AddFavorite)
-	router.POST(baseURL+"/api/post", wrapper.CreatePost)
-	router.GET(baseURL+"/api/post/close/user/:idUser/:page", wrapper.FindClosePostByUserID)
-	router.GET(baseURL+"/api/post/open/user/:idUser/:page", wrapper.FindOpenPostByUserID)
-	router.DELETE(baseURL+"/api/post/:id", wrapper.DeletePost)
-	router.GET(baseURL+"/api/post/:id", wrapper.FindPostByID)
-	router.PUT(baseURL+"/api/post/:id", wrapper.UpdatePost)
-	router.GET(baseURL+"/api/post/:tag/:page", wrapper.FindPostByTag)
-	router.POST(baseURL+"/api/search", wrapper.Search)
-	router.GET(baseURL+"/api/sort/new/:page", wrapper.GetAllPost)
+	router.GET(baseURL+"/api/v1/cart", wrapper.GetCart)
+	router.DELETE(baseURL+"/api/v1/cart/:id", wrapper.RemoveCart)
+	router.POST(baseURL+"/api/v1/cart/:id", wrapper.AddCart)
+	router.GET(baseURL+"/api/v1/favorite", wrapper.GetFavorite)
+	router.DELETE(baseURL+"/api/v1/favorite/:id", wrapper.RemoveFavorite)
+	router.POST(baseURL+"/api/v1/favorite/:id", wrapper.AddFavorite)
+	router.GET(baseURL+"/api/v1/post", wrapper.GetMiniPost)
+	router.POST(baseURL+"/api/v1/post", wrapper.CreatePost)
+	router.DELETE(baseURL+"/api/v1/post/:id", wrapper.DeletePost)
+	router.GET(baseURL+"/api/v1/post/:id", wrapper.FindPostByID)
+	router.PUT(baseURL+"/api/v1/post/:id", wrapper.UpdatePost)
+	router.POST(baseURL+"/api/v1/search", wrapper.Search)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"0kXF/y8AAP//QNebWUouAAA=",
+	"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",
+	"/+djSZaiKAAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

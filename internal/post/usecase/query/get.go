@@ -17,7 +17,7 @@ type GetIdHandler struct {
 func (h GetIdHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
-) (domain.Post, error) {
+) (domain.Post, domain.WrapperError) {
 	return h.postRepo.GetId(ctx, id)
 }
 
@@ -30,7 +30,7 @@ func (h GetByUserIdOpenHandler) Handle(
 	ctx context.Context,
 	idUser uuid.UUID,
 	number int,
-) ([]domain.Post, error) {
+) ([]domain.Post, domain.WrapperError) {
 	return h.postRepo.GetByUserIdOpen(ctx, idUser, number)
 }
 
@@ -43,7 +43,7 @@ func (h GetByUserIdCloseHandler) Handle(
 	ctx context.Context,
 	idUser uuid.UUID,
 	number int,
-) ([]domain.Post, error) {
+) ([]domain.Post, domain.WrapperError) {
 	return h.postRepo.GetByUserIdClose(ctx, idUser, number)
 }
 
@@ -55,7 +55,7 @@ type GetSortNewHandler struct {
 func (h GetSortNewHandler) Handle(
 	ctx context.Context,
 	number int,
-) ([]domain.Post, error) {
+) ([]domain.Post, domain.WrapperError) {
 	return h.postRepo.GetSortNew(ctx, number)
 }
 
@@ -68,7 +68,7 @@ func (h GetTagHandler) Handle(
 	ctx context.Context,
 	tag string,
 	number int,
-) ([]domain.Post, error) {
+) ([]domain.Post, domain.WrapperError) {
 	return h.postRepo.GetByTag(ctx, tag, number)
 }
 
@@ -80,7 +80,7 @@ type GetCartHandler struct {
 func (h GetCartHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
-) ([]uuid.UUID, error) {
+) ([]uuid.UUID, domain.WrapperError) {
 	return h.cartRepo.Get(ctx, userId)
 }
 
@@ -92,7 +92,7 @@ type GetFavoriteHandler struct {
 func (h GetFavoriteHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
-) ([]uuid.UUID, error) {
+) ([]uuid.UUID, domain.WrapperError) {
 	return h.postRepo.GetFavorite(ctx, userId)
 }
 
@@ -104,7 +104,7 @@ type GetByArrayHandler struct {
 func (h GetByArrayHandler) Handle(
 	ctx context.Context,
 	postId []uuid.UUID,
-) ([]domain.Post, error) {
+) ([]domain.Post, domain.WrapperError) {
 	return h.postRepo.GetByArray(ctx, postId)
 }
 
@@ -116,6 +116,6 @@ type SearchPostHandler struct {
 func (h SearchPostHandler) Handle(
 	ctx context.Context,
 	search string,
-) ([]uuid.UUID, error) {
+) ([]uuid.UUID, domain.WrapperError) {
 	return h.postRepo.Search(ctx, search)
 }

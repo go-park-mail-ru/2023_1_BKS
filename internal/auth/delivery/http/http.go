@@ -14,8 +14,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../../api/openapi/auth/models.cfg.yml ../../../../../api/openapi/auth/auth.yml
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../../api/openapi/auth/server.cfg.yml ../../../../../api/openapi/auth/auth.yml
+//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../api/openapi/auth/models.cfg.yml ../../../../api/openapi/auth/auth.yml
+//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../api/openapi/auth/server.cfg.yml ../../../../api/openapi/auth/auth.yml
 
 func sendUserError(ctx echo.Context, code int, message string) error {
 	userErr := ErrorHTTP{

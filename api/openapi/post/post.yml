@@ -9,37 +9,7 @@ servers:
       hostname:
         default: localhost
 paths:
-  /api/sort/new/{page}:
-      get:
-        summary: Основнвая страница
-        operationId: getAllPost
-        parameters:
-          - name: page
-            in: path
-            description: Номер страницы в отсортированной бд, от нового к старому.
-            required: true
-            schema:
-              type: integer
-        responses:
-          '200':
-            description: Объявления получены.
-            content:
-              application/json:
-                 schema:
-                  type: array
-                  items:
-                    oneOf:
-                      - $ref: '#/components/schemas/MiniPost'
-          '204':
-            description: Были просмотренны все объявления.
-  
-          default:
-            description: Произошла ошибка.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorHTTP'
-  /api/post:
+  /api/v1/post:
     post:
       summary: Создать новое объявление.
       operationId: createPost
@@ -54,13 +24,76 @@ paths:
       responses:
         '201':
           description: Объявление успешно создано.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: ID объявления.
         default:
           description: Произошла ошибка.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
-  /api/post/{id}:
+    get:
+        summary: Возврат массива постов.
+        operationId: GetMiniPost
+        parameters:
+          - name: offset
+            in: query
+            description: Количество объектов пропущеных в результирующей выборке.
+            required: true
+            schema:
+              type: integer
+          - name: limit
+            in: query
+            description: Количество возврощаемых объектов
+            required: true
+            schema:
+              type: integer
+          - name: status
+            in: query
+            description: Статус.
+            required: false
+            schema:
+              type: boolean
+          - name: sort
+            in: query
+            description: Метод сортировки.
+            required: false
+            schema:
+              type: string
+          - name: user
+            in: query
+            description: ID пользоввателя.
+            required: false
+            schema:
+              type: string
+          - name: tag
+            in: query
+            description: Тег.
+            required: false
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Объявления получены.
+            content:
+              application/json:
+                 schema:
+                  type: array
+                  items:
+                    oneOf:
+                      - $ref: '#/components/schemas/MiniPost'
+          '204':
+            description: Все объявления просмотрены.
+          default:
+            description: Произошла ошибка.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorHTTP'
+  /api/v1/post/{id}:
     get:
       summary: Вернуть объявление по id.
       operationId: findPostByID
@@ -77,7 +110,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
+                $ref: '#/components/schemas/FullPost'
+        '404':
+          description: Данного объявления не существует.
         default:
           description: Произошла ошибка.
           content:
@@ -101,14 +136,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePost'
+              $ref: '#/components/schemas/EditPost'
       responses:
-        '200':
+        '204':
           description: Объявление успешно обновлено.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
+        '404':
+          description: Данного объявления не существует.
         default:
           description: Произошла ошибка.
           content:
@@ -130,109 +163,8 @@ paths:
       responses:
         '204':
           description: Пользователь удалён.
-        default:
-          description: Произошла ошибка.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorHTTP'
-  /api/close/{userId}/{id}:
-    put:
-      summary: Закрыть объявление.
-      operationId: closePost
-      security:
-      - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          description: ID объявления.
-          required: true
-          schema:
-            type: string
-        - name: userId
-          in: path
-          description: ID поьзователя.
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Объявление успешно обновлено.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        default:
-          description: Произошла ошибка.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorHTTP'
-  /api/post/open/user/{idUser}/{page}:
-    get:
-      summary: Вернуть открытые объявления по id пользователя.
-      operationId: findOpenPostByUserID
-      parameters:
-        - name: idUser
-          in: path
-          description: ID пользоввателя.
-          required: true
-          schema:
-            type: string
-        - name: page
-          in: path
-          description: Старница.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Объявления получено.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/Post'
-        '204':
-            description: Были просмотренны все объявления.
-        default:
-          description: Произошла ошибка.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorHTTP'
-  
-  /api/post/close/user/{idUser}/{page}:
-    get:
-      summary: Вернуть закрытые объявления по id пользователя.
-      operationId: findClosePostByUserID
-      parameters:
-        - name: idUser
-          in: path
-          description: ID пользоввателя.
-          required: true
-          schema:
-            type: string
-        - name: page
-          in: path
-          description: Старница.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Объявления получено.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/Post'
-        '204':
-            description: Были просмотренны все объявления.
+        '404':
+          description: Данного объявления не существует.
         default:
           description: Произошла ошибка.
           content:
@@ -240,43 +172,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
                 
-  /api/post/{tag}/{page}:
-    get:
-      summary: Вернуть объявления по тегу.
-      operationId: findPostByTag
-      parameters:
-        - name: tag
-          in: path
-          description: Тег.
-          required: true
-          schema:
-            type: string
-        - name: page
-          in: path
-          description: Старница.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Объявления получено.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/MiniPost'
-        '204':
-            description: Были просмотренны все объявления.
-        default:
-          description: Произошла ошибка.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorHTTP'
-    
-  /api/cart:
+  /api/v1/cart:
     get:
       summary: Вернуть объявления из корзины.
       operationId: getCart
@@ -292,6 +188,8 @@ paths:
                 items:
                   oneOf:
                     - $ref: '#/components/schemas/MiniPost'
+        '204':
+            description: Корзина пуста.
         default:
           description: Произошла ошибка.
           content:
@@ -299,7 +197,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
   
-  /api/cart/{id}:
+  /api/v1/cart/{id}:
     post:
       summary: Добавить в корзину.
       operationId: addCart
@@ -337,6 +235,8 @@ paths:
       responses:
         '200':
           description: Объявление удаленно.
+        '204':
+            description: Такого товара нет в корзине.
         default:
           description: Произошла ошибка.
           content:
@@ -344,7 +244,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
                 
-  /api/favorite:
+  /api/v1/favorite:
     get:
       summary: Вернуть избранное.
       operationId: getFavorite
@@ -357,6 +257,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MiniPost'
+        '204':
+            description: В избранном пусто.
         default:
           description: Произошла ошибка.
           content:
@@ -365,7 +267,7 @@ paths:
                 $ref: '#/components/schemas/ErrorHTTP'              
                 
                 
-  /api/favorite/{id}:
+  /api/v1/favorite/{id}:
     post:
       summary: Добавить в избранное.
       operationId: addFavorite
@@ -403,6 +305,8 @@ paths:
       responses:
         '200':
           description: Объявление удаленно.
+        '204':
+            description: Такого объявления не существует.
         default:
           description: Произошла ошибка.
           content:
@@ -410,7 +314,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
 
-  /api/search:
+  /api/v1/search:
     post:
       summary: Поиск.
       operationId: search
@@ -428,6 +332,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MiniPost'
+        '204':
+            description: Ничего не найдено по данному запросу.
         default:
           description: Произошла ошибка.
           content:
@@ -467,45 +373,16 @@ components:
               items:
                 type: string
                 description: Изображение.
-  
-  
-    CreatePost:
-      allOf:
-        - required:
-            - Title
-            - Description
-            - Price
-            - Tag
-            - PathImages
-          properties:
-            Title:
-              type: string
-              description: Названия объявления.
-            Description:
-              type: string
-              description: Содержание объявления.
-            Price:
-              type: string
-              description: Цена объявления.
-            Tag:
-              type: string
-              description: Категория.
-            PathImages:
-              type: array
-              items:
-                type: string
-                description: Изображение.
-                
-              
-    Post:
+        
+    FullPost:
       allOf:
         - required:
             - UserId
             - Title
             - Description
             - Price
-            - Tag
-            - Close
+            - Category
+            - Status
             - Views
             - PathImages
           properties:
@@ -524,10 +401,10 @@ components:
             Price:
               type: string
               description: Цена объявления.
-            Tag:
+            Category:
               type: string
               description: Категория.
-            Close:
+            Status:
               type: boolean
               description: Закрыто ли объявление.
             PathImages:
@@ -535,6 +412,59 @@ components:
               items:
                 type: string
                 description: Изображение.
+  
+  
+    CreatePost:
+      allOf:
+        - required:
+            - Title
+            - Description
+            - Price
+            - Category
+            - PathImages
+          properties:
+            Title:
+              type: string
+              description: Названия объявления.
+            Description:
+              type: string
+              description: Содержание объявления.
+            Price:
+              type: string
+              description: Цена объявления.
+            Category:
+              type: string
+              description: Категория.
+            PathImages:
+              type: array
+              items:
+                type: string
+                description: Изображение.
+                
+    EditPost:
+      allOf:
+        - properties:
+            Title:
+              type: string
+              description: Названия объявления.
+            Description:
+              type: string
+              description: Содержание объявления.
+            Price:
+              type: string
+              description: Цена объявления.
+            Category:
+              type: string
+              description: Категория.
+            Status:
+              type: boolean
+              description: Закрыто ли объявление.
+            PathImages:
+              type: array
+              items:
+                type: string
+                description: Изображение.
+                
 
     ErrorHTTP:
       required:

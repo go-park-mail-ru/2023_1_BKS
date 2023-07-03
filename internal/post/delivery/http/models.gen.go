@@ -9,6 +9,9 @@ const (
 
 // CreatePost defines model for CreatePost.
 type CreatePost struct {
+	// Category Категория.
+	Category string `json:"Category"`
+
 	// Description Содержание объявления.
 	Description string   `json:"Description"`
 	PathImages  []string `json:"PathImages"`
@@ -16,11 +19,27 @@ type CreatePost struct {
 	// Price Цена объявления.
 	Price string `json:"Price"`
 
-	// Tag Категория.
-	Tag string `json:"Tag"`
-
 	// Title Названия объявления.
 	Title string `json:"Title"`
+}
+
+// EditPost defines model for EditPost.
+type EditPost struct {
+	// Category Категория.
+	Category *string `json:"Category,omitempty"`
+
+	// Description Содержание объявления.
+	Description *string   `json:"Description,omitempty"`
+	PathImages  *[]string `json:"PathImages,omitempty"`
+
+	// Price Цена объявления.
+	Price *string `json:"Price,omitempty"`
+
+	// Status Закрыто ли объявление.
+	Status *bool `json:"Status,omitempty"`
+
+	// Title Названия объявления.
+	Title *string `json:"Title,omitempty"`
 }
 
 // ErrorHTTP defines model for ErrorHTTP.
@@ -30,6 +49,31 @@ type ErrorHTTP struct {
 
 	// Message Error message
 	Message string `json:"message"`
+}
+
+// FullPost defines model for FullPost.
+type FullPost struct {
+	// Category Категория.
+	Category string `json:"Category"`
+
+	// Description Содержание объявления.
+	Description string   `json:"Description"`
+	PathImages  []string `json:"PathImages"`
+
+	// Price Цена объявления.
+	Price string `json:"Price"`
+
+	// Status Закрыто ли объявление.
+	Status bool `json:"Status"`
+
+	// Title Названия объявления.
+	Title string `json:"Title"`
+
+	// UserId Id пользователя.
+	UserId string `json:"UserId"`
+
+	// Views Количество просмотров.
+	Views int `json:"Views"`
 }
 
 // MiniPost defines model for MiniPost.
@@ -52,29 +96,25 @@ type MiniPost struct {
 	Views int `json:"Views"`
 }
 
-// Post defines model for Post.
-type Post struct {
-	// Close Закрыто ли объявление.
-	Close bool `json:"Close"`
+// GetMiniPostParams defines parameters for GetMiniPost.
+type GetMiniPostParams struct {
+	// Offset Количество объектов пропущеных в результирующей выборке.
+	Offset int `form:"offset" json:"offset"`
 
-	// Description Содержание объявления.
-	Description string   `json:"Description"`
-	PathImages  []string `json:"PathImages"`
+	// Limit Количество возврощаемых объектов
+	Limit int `form:"limit" json:"limit"`
 
-	// Price Цена объявления.
-	Price string `json:"Price"`
+	// Status Статус.
+	Status *bool `form:"status,omitempty" json:"status,omitempty"`
 
-	// Tag Категория.
-	Tag string `json:"Tag"`
+	// Sort Метод сортировки.
+	Sort *string `form:"sort,omitempty" json:"sort,omitempty"`
 
-	// Title Названия объявления.
-	Title string `json:"Title"`
+	// User ID пользоввателя.
+	User *string `form:"user,omitempty" json:"user,omitempty"`
 
-	// UserId Id пользователя.
-	UserId string `json:"UserId"`
-
-	// Views Количество просмотров.
-	Views int `json:"Views"`
+	// Tag Тег.
+	Tag *string `form:"tag,omitempty" json:"tag,omitempty"`
 }
 
 // SearchParams defines parameters for Search.
@@ -87,4 +127,4 @@ type SearchParams struct {
 type CreatePostJSONRequestBody = CreatePost
 
 // UpdatePostJSONRequestBody defines body for UpdatePost for application/json ContentType.
-type UpdatePostJSONRequestBody = CreatePost
+type UpdatePostJSONRequestBody = EditPost

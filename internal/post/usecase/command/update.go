@@ -17,19 +17,9 @@ type UpdateHandler struct {
 
 func (h *UpdateHandler) Handle(
 	ctx context.Context,
-	id uuid.UUID,
 	postDelivery domain.Post,
-) error {
-	post := domain.Post{
-		Id:         id,
-		UserID:     postDelivery.UserID,
-		Title:      postDelivery.Title,
-		Desciption: postDelivery.Desciption,
-		Price:      postDelivery.Price,
-		Tags:       postDelivery.Tags,
-		PathImages: postDelivery.PathImages,
-	}
-	err := h.postRepo.Update(ctx, post)
+) domain.WrapperError {
+	err := h.postRepo.Update(ctx, postDelivery)
 	return err
 }
 
@@ -42,7 +32,7 @@ type CloseHandler struct {
 func (h *CloseHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
-) error {
+) domain.WrapperError {
 	err := h.postRepo.Close(ctx, id)
 	return err
 }

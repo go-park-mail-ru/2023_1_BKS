@@ -31,14 +31,11 @@ func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 			RemoveCart:     command.NewRemoveCartHandler(&cartRepository, validator, logger),
 		},
 		Queries{
-			GetIdPost:          query.NewGetIdHandler(postRepository, logger),
-			GetSortNewPost:     query.NewGetSortNewHandler(postRepository, logger),
-			GetUserIdOpenPost:  query.NewGetByUserIdOpenHandler(postRepository, logger),
-			GetUserIdClosePost: query.NewGetByUserIdCloseHandler(postRepository, logger),
-			GetTagPost:         query.NewGetByTagHandler(postRepository, logger),
-			GetCart:            query.NewGetCartHandler(&cartRepository, logger),
-			GetFavorite:        query.NewGetFavoriteHandler(postRepository, logger),
-			GetByArray:         query.NewGetByArrayHandler(postRepository, logger),
-			SearhPost:          query.NewSearchPostHandler(postRepository, logger),
+			GetIdPost:   query.NewGetIdHandler(postRepository, logger),
+			GetMiniPost: query.NewGetMiniPostHandler(postRepository, logger),
+			GetCart:     query.NewGetCartHandler(&cartRepository, logger),
+			GetFavorite: query.NewGetFavoriteHandler(postRepository, logger),
+			GetByArray:  query.NewGetByArrayHandler(postRepository, logger),
+			SearhPost:   query.NewSearchPostHandler(postRepository, logger),
 		}
 }
