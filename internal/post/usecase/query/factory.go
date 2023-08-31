@@ -6,6 +6,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func NewGetMiniPostSortNewHandler(
+	postRepo domain.RRepository,
+	loger *logrus.Entry,
+) GetMiniPostSortNewHandler {
+	return GetMiniPostSortNewHandler{postRepo: postRepo, loger: loger}
+}
+
 func NewGetIdHandler(
 	postRepo domain.RRepository,
 	loger *logrus.Entry,
@@ -13,36 +20,9 @@ func NewGetIdHandler(
 	return GetIdHandler{postRepo: postRepo, loger: loger}
 }
 
-func NewGetSortNewHandler(
-	postRepo domain.RRepository,
-	loger *logrus.Entry,
-) GetSortNewHandler {
-	return GetSortNewHandler{postRepo: postRepo, loger: loger}
-}
-
-func NewGetByUserIdOpenHandler(
-	postRepo domain.RRepository,
-	loger *logrus.Entry,
-) GetByUserIdOpenHandler {
-	return GetByUserIdOpenHandler{postRepo: postRepo, loger: loger}
-}
-
-func NewGetByUserIdCloseHandler(
-	postRepo domain.RRepository,
-	loger *logrus.Entry,
-) GetByUserIdCloseHandler {
-	return GetByUserIdCloseHandler{postRepo: postRepo, loger: loger}
-}
-
-func NewGetByTagHandler(
-	postRepo domain.RRepository,
-	loger *logrus.Entry,
-) GetTagHandler {
-	return GetTagHandler{postRepo: postRepo, loger: loger}
-}
-
 func NewGetCartHandler(
 	cartRepo domain.RCartRepository,
+	postRepository domain.RRepository,
 	loger *logrus.Entry,
 ) GetCartHandler {
 	return GetCartHandler{cartRepo: cartRepo, loger: loger}
@@ -53,13 +33,6 @@ func NewGetFavoriteHandler(
 	loger *logrus.Entry,
 ) GetFavoriteHandler {
 	return GetFavoriteHandler{postRepo: postRepo, loger: loger}
-}
-
-func NewGetByArrayHandler(
-	postRepo domain.RRepository,
-	loger *logrus.Entry,
-) GetByArrayHandler {
-	return GetByArrayHandler{postRepo: postRepo, loger: loger}
 }
 
 func NewSearchPostHandler(

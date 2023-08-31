@@ -24,18 +24,16 @@ func NewUsecase(ctx context.Context, cfg config.Config) (Commands, Queries) {
 			CreatePost:     command.NewCreateHandler(&postRepository, validator, logger),
 			UpdatePost:     command.NewUpdateHandler(&postRepository, validator, logger),
 			DeletePost:     command.NewDeleteHandler(&postRepository, validator, logger),
-			ClosePost:      command.NewCloseHandler(&postRepository, validator, logger),
 			AddFavorite:    command.NewAddFavoriteHandler(&postRepository, validator, logger),
 			RemoveFavorite: command.NewRemoveFavoriteHandler(&postRepository, validator, logger),
 			AddCart:        command.NewAddCartHandler(&cartRepository, validator, logger),
 			RemoveCart:     command.NewRemoveCartHandler(&cartRepository, validator, logger),
 		},
 		Queries{
-			GetIdPost:   query.NewGetIdHandler(postRepository, logger),
-			GetMiniPost: query.NewGetMiniPostHandler(postRepository, logger),
-			GetCart:     query.NewGetCartHandler(&cartRepository, logger),
-			GetFavorite: query.NewGetFavoriteHandler(postRepository, logger),
-			GetByArray:  query.NewGetByArrayHandler(postRepository, logger),
-			SearhPost:   query.NewSearchPostHandler(postRepository, logger),
+			GetIdPost:          query.NewGetIdHandler(postRepository, logger),
+			GetMiniPostSortNew: query.NewGetMiniPostSortNewHandler(postRepository, logger),
+			GetCart:            query.NewGetCartHandler(&cartRepository, postRepository, logger),
+			GetFavorite:        query.NewGetFavoriteHandler(postRepository, logger),
+			SearhPost:          query.NewSearchPostHandler(postRepository, logger),
 		}
 }

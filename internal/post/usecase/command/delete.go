@@ -18,9 +18,8 @@ type DeleteHandler struct {
 func (h *DeleteHandler) Handle(
 	ctx context.Context,
 	id uuid.UUID,
-) domain.WrapperError {
-	err := h.postRepo.Delete(ctx, id)
-	return err
+) (int, error) {
+	return h.postRepo.Delete(ctx, id)
 }
 
 type RemoveCartHandler struct {
@@ -33,9 +32,8 @@ func (h *RemoveCartHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
 	postId uuid.UUID,
-) domain.WrapperError {
-	err := h.cartRepo.Remove(ctx, userId, postId)
-	return err
+) (int, error) {
+	return h.cartRepo.Remove(ctx, userId, postId)
 }
 
 type RemoveFavoriteHandler struct {
@@ -48,7 +46,6 @@ func (h *RemoveFavoriteHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
 	postId uuid.UUID,
-) domain.WrapperError {
-	err := h.postRepo.RemoveFavorite(ctx, userId, postId)
-	return err
+) (int, error) {
+	return h.postRepo.RemoveFavorite(ctx, userId, postId)
 }

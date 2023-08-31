@@ -32,14 +32,6 @@ func NewDeleteHandler(
 	return DeleteHandler{postRepo: postRepo, validator: validator, loger: loger}
 }
 
-func NewCloseHandler(
-	postRepo domain.CUDRepository,
-	validator domain.SpecificationManager,
-	loger *logrus.Entry,
-) CloseHandler {
-	return CloseHandler{postRepo: postRepo, validator: validator, loger: loger}
-}
-
 func NewAddCartHandler(
 	cartRepo domain.CUDCartRepository,
 	validator domain.SpecificationManager,

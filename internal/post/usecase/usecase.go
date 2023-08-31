@@ -10,7 +10,6 @@ type Commands struct {
 	CreatePost     command.CreateHandler
 	UpdatePost     command.UpdateHandler
 	DeletePost     command.DeleteHandler
-	ClosePost      command.CloseHandler
 	AddCart        command.AddCartHandler
 	RemoveCart     command.RemoveCartHandler
 	AddFavorite    command.AddFavoriteHandler
@@ -20,12 +19,8 @@ type Commands struct {
 // В данном агрегате перечисленны все запросы сервиса объявлений
 type Queries struct {
 	GetIdPost          query.GetIdHandler
-	GetUserIdOpenPost  query.GetByUserIdOpenHandler
-	GetUserIdClosePost query.GetByUserIdCloseHandler
-	GetSortNewPost     query.GetSortNewHandler
-	GetTagPost         query.GetTagHandler
+	GetMiniPostSortNew query.GetMiniPostSortNewHandler
 	GetCart            query.GetCartHandler
 	GetFavorite        query.GetFavoriteHandler
-	GetByArray         query.GetByArrayHandler
 	SearhPost          query.SearchPostHandler
 }

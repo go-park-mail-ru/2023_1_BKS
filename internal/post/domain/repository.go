@@ -15,11 +15,11 @@ type CUDRepository interface {
 }
 
 type RRepository interface {
-	GetId(ctx context.Context, id uuid.UUID) (*Post, int, error)
-	GetMiniPost(ctx context.Context, par Parameters) ([]Post, int, error)
+	GetIdPost(ctx context.Context, id uuid.UUID) (*Post, int, error)
+	GetMiniPostSortNew(ctx context.Context, par Parameters) ([]Post, int, error)
 	GetFavorite(ctx context.Context, userId uuid.UUID) ([]uuid.UUID, int, error)
 	GetCart(ctx context.Context, postId []uuid.UUID) ([]Post, int, error)
-	Search(ctx context.Context, search string) ([]uuid.UUID, int, error)
+	SearchPost(ctx context.Context, search string) ([]uuid.UUID, int, error)
 }
 
 type CUDCartRepository interface {

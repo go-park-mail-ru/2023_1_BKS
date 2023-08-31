@@ -2,7 +2,7 @@ package v2
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_1_BKS/internal/post/domain"
@@ -18,10 +18,10 @@ import (
 //go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../api/openapi/post/models.cfg.yml ../../../../api/openapi/post/post.yml
 //go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=../../../../api/openapi/post/server.cfg.yml ../../../../api/openapi/post/post.yml
 
-func sendPostError(ctx echo.Context, code int, message string) error {
+func sendPostError(ctx echo.Context, code int, message error) error {
 	postErr := ErrorHTTP{
 		Code:    int32(code),
-		Message: message,
+		Message: message.Error(),
 	}
 	err := ctx.JSON(code, postErr)
 	return err
@@ -41,7 +41,7 @@ func (a *HttpServer) CreatePost(ctx echo.Context) error {
 
 	err := ctx.Bind(&post)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, "Incorrect request format")
+		return sendPostError(ctx, http.StatusBadRequest, errors.New("Incorrect request format"))
 	}
 
 	headerAuth := ctx.Request().Header.Get("Authorization")
@@ -49,7 +49,7 @@ func (a *HttpServer) CreatePost(ctx echo.Context) error {
 
 	uuidUser, err := uuid.Parse(userId)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
 	postDTO := domain.Post{
@@ -61,9 +61,9 @@ func (a *HttpServer) CreatePost(ctx echo.Context) error {
 		PathImages:  &post.PathImages,
 	}
 
-	uuidPost, wrappErr := a.command.CreatePost.Handle(context.Background(), postDTO)
-	if wrappErr.Error != nil {
-		return sendPostError(ctx, wrappErr.HTTPStatusCode, wrappErr.Error.Error())
+	uuidPost, code, err := a.command.CreatePost.Handle(context.Background(), postDTO)
+	if err != nil {
+		return sendPostError(ctx, code, err)
 	}
 
 	return ctx.JSON(http.StatusCreated, uuidPost)
@@ -74,7 +74,7 @@ func (a *HttpServer) UpdatePost(ctx echo.Context, id string) error {
 
 	err := ctx.Bind(&post)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, "Неправильный формат запроса")
+		return sendPostError(ctx, http.StatusBadRequest, errors.New("Incorrect request format"))
 	}
 
 	headerAuth := ctx.Request().Header.Get("Authorization")
@@ -82,12 +82,12 @@ func (a *HttpServer) UpdatePost(ctx echo.Context, id string) error {
 
 	uuidUser, err := uuid.Parse(idUser)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, err.Error())
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
 	uuidPost, err := uuid.Parse(id)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, err.Error())
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
 	postDTO := domain.Post{
@@ -100,9 +100,9 @@ func (a *HttpServer) UpdatePost(ctx echo.Context, id string) error {
 		PathImages:  post.PathImages,
 	}
 
-	wrappErr := a.command.UpdatePost.Handle(context.Background(), postDTO)
-	if wrappErr.Error != nil {
-		return sendPostError(ctx, wrappErr.HTTPStatusCode, wrappErr.Error.Error())
+	code, err := a.command.UpdatePost.Handle(context.Background(), postDTO)
+	if err != nil {
+		return sendPostError(ctx, code, err)
 	}
 
 	return ctx.NoContent(http.StatusNoContent)
@@ -111,12 +111,12 @@ func (a *HttpServer) UpdatePost(ctx echo.Context, id string) error {
 func (a *HttpServer) DeletePost(ctx echo.Context, id string) error {
 	uuidPost, err := uuid.Parse(id)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, err.Error())
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
-	wrapErr := a.command.DeletePost.Handle(context.Background(), uuidPost)
-	if wrapErr.Error != nil {
-		return sendPostError(ctx, http.StatusBadRequest, err.Error())
+	code, err := a.command.DeletePost.Handle(context.Background(), uuidPost)
+	if err != nil {
+		return sendPostError(ctx, code, err)
 	}
 
 	return ctx.NoContent(http.StatusNoContent)
@@ -125,12 +125,12 @@ func (a *HttpServer) DeletePost(ctx echo.Context, id string) error {
 func (a HttpServer) FindPostByID(ctx echo.Context, id string) error {
 	uuidPost, err := uuid.Parse(id)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
-	resultDTO, err := a.query.GetIdPost.Handle(context.Background(), uuidPost)
+	resultDTO, code, err := a.query.GetIdPost.Handle(context.Background(), uuidPost)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, code, err)
 	}
 
 	result := FullPost{
@@ -148,9 +148,29 @@ func (a HttpServer) FindPostByID(ctx echo.Context, id string) error {
 }
 
 func (a HttpServer) GetMiniPost(ctx echo.Context, params GetMiniPostParams) error {
-	resultDTO, err := a.query.GetSortNewPost.Handle(context.Background(), 1)
+
+	var uuidUser uuid.UUID
+	var err error
+
+	if params.User != nil {
+		uuidUser, err = uuid.Parse(*params.User)
+		if err != nil {
+			return sendPostError(ctx, http.StatusBadRequest, err)
+		}
+	}
+
+	param := domain.Parameters{
+		Offset:   &params.Offset,
+		Limit:    &params.Limit,
+		Status:   params.Status,
+		Sort:     params.Sort,
+		UserId:   &uuidUser,
+		Category: params.Tag,
+	}
+
+	resultDTO, code, err := a.query.GetMiniPostSortNew.Handle(context.Background(), param)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, code, err)
 	}
 
 	var result []MiniPost
@@ -175,7 +195,7 @@ func (a HttpServer) GetMiniPost(ctx echo.Context, params GetMiniPostParams) erro
 func (a HttpServer) AddCart(ctx echo.Context, id string) error {
 	postId, err := uuid.Parse(id)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
 	headerAuth := ctx.Request().Header.Get("Authorization")
@@ -183,12 +203,12 @@ func (a HttpServer) AddCart(ctx echo.Context, id string) error {
 
 	userId, err := uuid.Parse(user)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
-	err = a.command.AddCart.Handle(context.Background(), userId, postId)
+	code, err := a.command.AddCart.Handle(context.Background(), userId, postId)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, code, err)
 	}
 
 	return ctx.JSON(http.StatusCreated, "Ok")
@@ -197,7 +217,7 @@ func (a HttpServer) AddCart(ctx echo.Context, id string) error {
 func (a HttpServer) RemoveCart(ctx echo.Context, id string) error {
 	postId, err := uuid.Parse(id)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
 	headerAuth := ctx.Request().Header.Get("Authorization")
@@ -205,12 +225,12 @@ func (a HttpServer) RemoveCart(ctx echo.Context, id string) error {
 
 	userId, err := uuid.Parse(user)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
-	err = a.command.RemoveCart.Handle(context.Background(), userId, postId)
+	code, err := a.command.RemoveCart.Handle(context.Background(), userId, postId)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, code, err)
 	}
 
 	return ctx.JSON(http.StatusCreated, "Ok")
@@ -223,17 +243,12 @@ func (a HttpServer) GetCart(ctx echo.Context) error {
 
 	userId, err := uuid.Parse(user)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
-	resultUUID, err := a.query.GetCart.Handle(context.Background(), userId)
+	resultDTO, code, err := a.query.GetCart.Handle(context.Background(), userId)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
-	}
-
-	resultDTO, err := a.query.GetByArray.Handle(context.Background(), resultUUID)
-	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, code, err)
 	}
 
 	var result []MiniPost
@@ -259,7 +274,7 @@ func (a HttpServer) GetCart(ctx echo.Context) error {
 func (a HttpServer) AddFavorite(ctx echo.Context, id string) error {
 	postId, err := uuid.Parse(id)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
 	headerAuth := ctx.Request().Header.Get("Authorization")
@@ -267,12 +282,12 @@ func (a HttpServer) AddFavorite(ctx echo.Context, id string) error {
 
 	userId, err := uuid.Parse(user)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
-	err = a.command.AddFavorite.Handle(context.Background(), userId, postId)
+	code, err := a.command.AddFavorite.Handle(context.Background(), userId, postId)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, code, err)
 	}
 
 	return ctx.JSON(http.StatusCreated, "Ok")
@@ -281,7 +296,7 @@ func (a HttpServer) AddFavorite(ctx echo.Context, id string) error {
 func (a HttpServer) RemoveFavorite(ctx echo.Context, id string) error {
 	postId, err := uuid.Parse(id)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
 	headerAuth := ctx.Request().Header.Get("Authorization")
@@ -289,51 +304,46 @@ func (a HttpServer) RemoveFavorite(ctx echo.Context, id string) error {
 
 	userId, err := uuid.Parse(user)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, http.StatusBadRequest, err)
 	}
 
-	err = a.command.RemoveFavorite.Handle(context.Background(), userId, postId)
+	code, err := a.command.RemoveFavorite.Handle(context.Background(), userId, postId)
 	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return sendPostError(ctx, code, err)
 	}
 
 	return ctx.JSON(http.StatusCreated, "Ok")
 }
 
 func (a HttpServer) GetFavorite(ctx echo.Context) error {
-
-	headerAuth := ctx.Request().Header.Get("Authorization")
-	user := jwt.ClaimParse(headerAuth, "id")
-	fmt.Println(user)
-	userId, err := uuid.Parse(user)
-	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
-	}
-
-	resultUUID, err := a.query.GetFavorite.Handle(context.Background(), userId)
-	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
-	}
-
-	resultDTO, err := a.query.GetByArray.Handle(context.Background(), resultUUID)
-	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
-	}
-
-	var result []MiniPost
-	for _, post := range resultDTO {
-		p := MiniPost{
-			PostId:     post.Id.String(),
-			PathImages: *post.PathImages,
-			Price:      *post.Price,
-			Title:      *post.Title,
-			UserId:     post.UserID.String(),
-			Views:      *post.Views,
+	/*
+		headerAuth := ctx.Request().Header.Get("Authorization")
+		user := jwt.ClaimParse(headerAuth, "id")
+		fmt.Println(user)
+		userId, err := uuid.Parse(user)
+		if err != nil {
+			return sendPostError(ctx, http.StatusBadRequest, err)
 		}
-		result = append(result, p)
-	}
-	fmt.Println(result)
-	return ctx.JSON(http.StatusOK, result)
+
+		resultDTO, code, err := a.query.GetFavorite.Handle(context.Background(), userId)
+		if err != nil {
+			return sendPostError(ctx, code, err)
+		}
+
+		var result []MiniPost
+		for _, post := range resultDTO {
+			p := MiniPost{
+				PostId:     post.Id.String(),
+				PathImages: *post.PathImages,
+				Price:      *post.Price,
+				Title:      *post.Title,
+				UserId:     post.UserID.String(),
+				Views:      *post.Views,
+			}
+			result = append(result, p)
+		}
+		fmt.Println(result)*/
+	return ctx.JSON(http.StatusOK, 10)
 }
 
 // ///////////////////////////////////////////////////////////////////////////////////////////
@@ -341,29 +351,30 @@ func (a HttpServer) GetFavorite(ctx echo.Context) error {
 // ///////////////////////////////////////////////////////////////////////////////////////////
 
 func (a HttpServer) Search(ctx echo.Context, params SearchParams) error {
-
-	resultDTOUuid, err := a.query.SearhPost.Handle(context.Background(), params.Query)
-	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
-	}
-
-	resultDTO, err := a.query.GetByArray.Handle(context.Background(), resultDTOUuid)
-	if err != nil {
-		return sendPostError(ctx, http.StatusBadRequest, fmt.Sprintf("%v", err))
-	}
-
-	var result []MiniPost
-	for _, post := range resultDTO {
-		p := MiniPost{
-			PostId:     post.Id.String(),
-			PathImages: *post.PathImages,
-			Price:      *post.Price,
-			Title:      *post.Title,
-			UserId:     post.UserID.String(),
-			Views:      *post.Views,
+	/*
+		resultDTOUuid, code, err := a.query.SearhPost.Handle(context.Background(), params.Query)
+		if err != nil {
+			return sendPostError(ctx, code, err)
 		}
-		result = append(result, p)
-	}
-	fmt.Println(result)
-	return ctx.JSON(http.StatusOK, result)
+
+		resultDTO, err := a.query.GetByArray.Handle(context.Background(), resultDTOUuid)
+		if err != nil {
+			return sendPostError(ctx, http.StatusBadRequest, err)
+		}
+
+		var result []MiniPost
+		for _, post := range resultDTO {
+			p := MiniPost{
+				PostId:     post.Id.String(),
+				PathImages: *post.PathImages,
+				Price:      *post.Price,
+				Title:      *post.Title,
+				UserId:     post.UserID.String(),
+				Views:      *post.Views,
+			}
+			result = append(result, p)
+		}
+		fmt.Println(result)
+	*/
+	return ctx.JSON(http.StatusOK, 11)
 }

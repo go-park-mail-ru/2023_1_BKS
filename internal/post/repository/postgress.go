@@ -17,7 +17,7 @@ type PostPostgressRepository struct {
 	posts *sql.DB
 }
 
-func (t PostPostgressRepository) GetId(ctx context.Context,
+func (t PostPostgressRepository) GetIdPost(ctx context.Context,
 	id uuid.UUID) (*domain.Post, int, error) {
 
 	var result domain.Post
@@ -43,7 +43,7 @@ func (t PostPostgressRepository) GetId(ctx context.Context,
 	return &result, http.StatusOK, nil
 }
 
-func (t PostPostgressRepository) GetMiniPost(ctx context.Context,
+func (t PostPostgressRepository) GetMiniPostSortNew(ctx context.Context,
 	par domain.Parameters) ([]domain.Post, int, error) {
 
 	if *par.Offset <= 0 {
@@ -126,7 +126,7 @@ func (t PostPostgressRepository) GetFavorite(ctx context.Context,
 	return postId, http.StatusOK, nil
 }
 
-func (t PostPostgressRepository) GetByCart(ctx context.Context,
+func (t PostPostgressRepository) GetCart(ctx context.Context,
 	postId []uuid.UUID) ([]domain.Post, int, error) {
 	var posts []domain.Post
 
@@ -148,7 +148,7 @@ func (t PostPostgressRepository) GetByCart(ctx context.Context,
 	return posts, http.StatusOK, nil
 }
 
-func (t PostPostgressRepository) Search(ctx context.Context,
+func (t PostPostgressRepository) SearchPost(ctx context.Context,
 	search string) ([]uuid.UUID, int, error) {
 
 	_, err := t.posts.Exec(`UPDATE posts SET fts = setweight(to_tsvector(title), 'A')

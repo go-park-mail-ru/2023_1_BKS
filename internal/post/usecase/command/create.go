@@ -19,11 +19,11 @@ type CreateHandler struct {
 func (h *CreateHandler) Handle(
 	ctx context.Context,
 	postDelivery domain.Post,
-) (uuid.UUID, domain.WrapperError) {
+) (uuid.UUID, int, error) {
 	*postDelivery.Time = time.Now()
 	*postDelivery.Id = uuid.New()
-	err := h.postRepo.Create(ctx, postDelivery)
-	return *postDelivery.Id, err
+	code, err := h.postRepo.Create(ctx, postDelivery)
+	return *postDelivery.Id, code, err
 }
 
 type AddCartHandler struct {
@@ -36,9 +36,9 @@ func (h *AddCartHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
 	postId uuid.UUID,
-) domain.WrapperError {
-	err := h.cartRepo.Add(ctx, userId, postId)
-	return err
+) (int, error) {
+	code, err := h.cartRepo.Add(ctx, userId, postId)
+	return code, err
 }
 
 type AddFavoriteHandler struct {
@@ -51,7 +51,7 @@ func (h *AddFavoriteHandler) Handle(
 	ctx context.Context,
 	userId uuid.UUID,
 	postId uuid.UUID,
-) domain.WrapperError {
-	err := h.postRepo.AddFavorite(ctx, userId, postId)
-	return err
+) (int, error) {
+	code, err := h.postRepo.AddFavorite(ctx, userId, postId)
+	return code, err
 }

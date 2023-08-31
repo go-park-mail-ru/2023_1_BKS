@@ -96,7 +96,7 @@ paths:
   /api/v1/post/{id}:
     get:
       summary: Вернуть объявление по id.
-      operationId: findPostByID
+      operationId: GetIdPost
       parameters:
         - name: id
           in: path
@@ -119,7 +119,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorHTTP'
-    put:
+    patch:
       summary: Обновить объявление.
       operationId: updatePost
       security:
@@ -315,7 +315,7 @@ paths:
                 $ref: '#/components/schemas/ErrorHTTP'
 
   /api/v1/search:
-    post:
+    get:
       summary: Поиск.
       operationId: search
       parameters:
