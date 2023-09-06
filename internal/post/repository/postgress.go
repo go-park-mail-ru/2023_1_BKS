@@ -36,9 +36,9 @@ func (t PostPostgressRepository) GetIdPost(ctx context.Context,
 		return nil, http.StatusInternalServerError, err
 	}
 	// Удалить от сюда
-	*result.Views = *result.Views + 1
-	_, err = t.posts.Exec("update posts set views = $1 where id = $2",
-		*result.Views, id)
+	//*result.Views = *result.Views + 1
+	//_, err = t.posts.Exec("update posts set views = $1 where id = $2",
+	//	*result.Views, id)
 	//До сюда
 	return &result, http.StatusOK, nil
 }
@@ -54,10 +54,13 @@ func (t PostPostgressRepository) GetMiniPostSortNew(ctx context.Context,
 	var err error
 	//SELECT * FROM EMPLOYEE WHERE name = 'Clark' and (dept IS NOT NULL) or name = 'Dave' and (dept IS  NULL);
 	if *par.Sort == "New" || par.Sort == nil {
-		rows, err = t.posts.Query(`SELECT id, userid, title, description,
-		price,  images, time FROM posts WHERE tags = $1 and close = $2 and 
-		ORDER BY time LIMIT $3 OFFSET $4`, par.Category, par.Offset, par.Limit,
-			par.Status, par.UserId)
+		rows, err = t.posts.Query(`SELECT id, userid, title, description, price, images, time 
+		FROM posts
+		WHERE (tags = COALESCE($1, tags) OR $1 IS NULL) AND
+			  (close = COALESCE($2, close) OR $2 IS NULL) AND
+			  (userid = COALESCE($3, userid) OR $3 IS NULL)
+		ORDER BY time LIMIT $4 OFFSET $5`, par.Category, par.Status, par.UserId,
+			par.Limit, par.Offset)
 	}
 
 	if err != nil {
@@ -71,17 +74,16 @@ func (t PostPostgressRepository) GetMiniPostSortNew(ctx context.Context,
 		err = rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Description,
 			&p.Price, pq.Array(&p.PathImages), &p.Time)
 		if err != nil {
-			// Сделать возврат ошибки
 			fmt.Println(err)
 			continue
 		}
 		posts = append(posts, p)
 	}
-	// Подумать нд именованием ошибки
+
 	if err = rows.Err(); err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
-	// Подумать нд именованием ошибки
+
 	if err = rows.Close(); err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -114,11 +116,10 @@ func (t PostPostgressRepository) GetFavorite(ctx context.Context,
 		}
 	}
 
-	// Подумать нд именованием ошибки
 	if err = rows.Err(); err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
-	// Подумать нд именованием ошибки
+
 	if err = rows.Close(); err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -203,8 +204,13 @@ func (t *PostPostgressRepository) Create(ctx context.Context,
 func (t *PostPostgressRepository) Update(ctx context.Context,
 	post domain.Post) (int, error) {
 
-	_, err := t.posts.Exec(`update posts set  title = $1, description = $2,
-	price = $3,  tags = $4, images = $5  where id = $6 and userid = $7`,
+	_, err := t.posts.Exec(`update posts set
+	title = CASE WHEN $1 IS NOT NULL THEN $1 ELSE title END,
+	description = CASE WHEN $2 IS NOT NULL THEN $2 ELSE description END,
+	price =  CASE WHEN $3 IS NOT NULL THEN $3 ELSE price END,
+	tags =  CASE WHEN $4 IS NOT NULL THEN $4 ELSE tags END,
+	images = CASE WHEN $5 IS NOT NULL THEN $5 ELSE images END
+	where id = $6 and userid = $7`,
 		post.Title, post.Description, post.Price,
 		post.Description, pq.Array(post.PathImages), post.Id, post.UserID)
 
